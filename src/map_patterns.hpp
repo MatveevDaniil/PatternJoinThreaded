@@ -14,7 +14,7 @@ void map_patterns(
   int cutoff,
   char pattern_type,
   str2int& str2idx,
-  ints* strings_subset,
+  const ints* strings_subset,
   str2ints& pat2str,
   const std::string& trim_part = "",
   const char metric_type = 'L'

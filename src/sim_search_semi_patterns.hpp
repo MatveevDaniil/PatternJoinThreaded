@@ -16,7 +16,7 @@ void sim_search_semi_patterns_impl(
   char metric,
   str2int& str2idx,
   int_pair_set& out,
-  ints* strings_subset = nullptr,
+  const ints* strings_subset = nullptr,
   bool include_eye = true,
   const std::string &trim_part = ""
 ) {

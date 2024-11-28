@@ -10,6 +10,8 @@
 #include "file_io.hpp"
 #include "bounded_edit_distance.hpp"
 #include "trim_strings.hpp"
+#include "omp.h"
+#include <iostream>
 
 template <TrimDirection trim_direction>
 inline void check_part(
@@ -21,12 +23,26 @@ inline void check_part(
   int_pair_set& out
 ) {
   distance_k_ptr distance_k = get_distance_k(metric);
-  for (auto entry = part2strings.begin(); entry != part2strings.end(); entry++) {
+  std::vector<std::pair<std::string, ints>*> entries;
+  entries.reserve(part2strings.size());
+  for (auto& entry : part2strings) {
+    entries.push_back(&entry);
+  }
+  #pragma omp parallel 
+  {
+  int thread_id = omp_get_thread_num(); // Get thread ID
+  #pragma omp critical
+  {
+    std::cout << "Thread " << thread_id << std::endl;
+  }
+  #pragma omp for
+  for (size_t i = 0; i < entries.size(); ++i) {
+    const auto* entry = entries[i];
     int part_len = entry->first.size();
     if (entry->second.size() == 1)
       out.insert({entry->second[0], entry->second[0]});
     else if (entry->second.size() < 59) {
-      ints *string_indeces = &(entry->second);
+      const ints *string_indeces = &(entry->second);
       std::vector<std::string> trimmed_strings(string_indeces->size());
 
 
@@ -81,6 +97,7 @@ inline void check_part(
       sim_search_semi_patterns_impl<trim_direction>(
         strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
     }
+  }
   }
 }
 
