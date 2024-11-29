@@ -37,7 +37,7 @@ inline void check_part(
   int thread_id = omp_get_thread_num();
   double wtime = omp_get_wtime();
   int_pair_set& local_out = out_t[thread_id]; 
-  #pragma omp for
+  #pragma omp for nowait
   for (size_t i = 0; i < entries.size(); ++i) {
     const auto* entry = entries[i];
     int part_len = entry->first.size();
