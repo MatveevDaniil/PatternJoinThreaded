@@ -32,9 +32,9 @@ inline void check_part(
   #pragma omp parallel 
   {
   int thread_id = omp_get_thread_num(); // Get thread ID
+  auto start = std::chrono::high_resolution_clock::now();
   #pragma omp for
   for (size_t i = 0; i < entries.size(); ++i) {
-    auto start = std::chrono::high_resolution_clock::now();
     const auto* entry = entries[i];
     int part_len = entry->first.size();
     if (entry->second.size() == 1)
@@ -95,10 +95,10 @@ inline void check_part(
       sim_search_semi_patterns_impl<trim_direction>(
         strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
     }
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed = end - start;
-    printf("Thread %d took %f seconds\n", thread_id, elapsed.count());
   }
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = end - start;
+  printf("Thread %d took %f seconds\n", thread_id, elapsed.count());
   }
 }
 
