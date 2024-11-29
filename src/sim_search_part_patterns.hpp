@@ -29,7 +29,11 @@ inline void check_part(
   for (auto& entry : part2strings) {
     entries.push_back(&entry);
   }
-  std::vector<int_pair_set> out_t(omp_get_max_threads());
+  std::vector<int_pair_set> out_t;
+  out_t.reserve(omp_get_max_threads());
+  for (int i = 0; i < omp_get_max_threads(); ++i) {
+    out_t.emplace_back();
+  }
   #pragma omp parallel 
   {
   auto start = std::chrono::high_resolution_clock::now();
