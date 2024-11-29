@@ -26,17 +26,16 @@ inline void check_part(
   distance_k_ptr distance_k = get_distance_k(metric);
   std::vector<std::pair<std::string, ints>*> entries;
   entries.reserve(part2strings.size());
-  for (auto& entry : part2strings) {
+  for (auto& entry : part2strings)
     entries.push_back(&entry);
-  }
   std::vector<int_pair_set> out_t;
   out_t.reserve(omp_get_max_threads());
-  for (int i = 0; i < omp_get_max_threads(); ++i) {
+  for (int i = 0; i < omp_get_max_threads(); ++i)
     out_t.emplace_back();
-  }
   #pragma omp parallel 
   {
   int thread_id = omp_get_thread_num();
+  double wtime = omp_get_wtime();
   int_pair_set& local_out = out_t[thread_id]; 
   #pragma omp for
   for (size_t i = 0; i < entries.size(); ++i) {
@@ -47,7 +46,6 @@ inline void check_part(
     else if (entry->second.size() < 50) {
       const ints *string_indeces = &(entry->second);
       std::vector<std::string> trimmed_strings(string_indeces->size());
-
 
       if (trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
         if (trim_direction == TrimDirection::Mid) {
@@ -97,14 +95,12 @@ inline void check_part(
       }
 
     } else {
-      auto start = std::chrono::high_resolution_clock::now();
       sim_search_semi_patterns_impl<trim_direction>(
         strings, cutoff, metric, str2idx, local_out, &entry->second, false, entry->first);
-      auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double> elapsed = end - start;
-      printf("%d %f\n", thread_id, elapsed.count());
     }
   }
+  wtime = omp_get_wtime() - wtime;
+  printf("thread=%d: %f\n", thread_id, wtime);
   }
   for (const auto& local_out : out_t)
     out.insert(local_out.begin(), local_out.end());
