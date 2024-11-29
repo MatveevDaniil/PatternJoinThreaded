@@ -14,9 +14,9 @@ void sim_search_2parts(
   start2idxs.reserve(strings.size());
   end2idxs.reserve(strings.size());
   if (metric == 'L')
-    for (int i = 0; i < strings.size(); i++) {
+    for (size_t i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
-      int half_len = str.size() / 2;
+      size_t half_len = str.size() / 2;
       start2idxs[str.substr(0, half_len)].push_back(i);
       end2idxs[str.substr(half_len)].push_back(i);
       if (str.size() % 2 == 1) {
@@ -25,9 +25,9 @@ void sim_search_2parts(
       }
     }
   else
-    for (int i = 0; i < strings.size(); i++) {
+    for (size_t i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
-      int half_len = str.size() / 2;
+      size_t half_len = str.size() / 2;
       if (str.size() % 2 == 0) {
         start2idxs[str.substr(0, half_len)].push_back(i);
         end2idxs[str.substr(half_len)].push_back(i);
@@ -43,7 +43,7 @@ void sim_search_2parts(
   check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
   
   if (include_eye)
-    for (int i = 0; i < strings.size(); i++)
+    for (size_t i = 0; i < strings.size(); i++)
       out.insert({i, i});
 }
 
@@ -60,10 +60,10 @@ void sim_search_3parts(
   mid2idxs.reserve(strings.size());
   end2idxs.reserve(strings.size());
   if (metric == 'L')
-    for (int i = 0; i < strings.size(); i++) {
+    for (size_t i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
-      int part_len = str.size() / 3;
-      int residue = str.size() % 3;
+      size_t part_len = str.size() / 3;
+      size_t residue = str.size() % 3;
       if (residue == 0) {
         start2idxs[str.substr(0, part_len)].push_back(i);
         mid2idxs[str.substr(part_len, part_len)].push_back(i);
@@ -88,10 +88,10 @@ void sim_search_3parts(
       }
     }
   else
-    for (int i = 0; i < strings.size(); i++) {
+    for (size_t i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
-      int part_len = str.size() / 3;
-      int residue = str.size() % 3;
+      size_t part_len = str.size() / 3;
+      size_t residue = str.size() % 3;
       if (residue == 0) {
         start2idxs[str.substr(0, part_len)].push_back(i);
         mid2idxs[str.substr(part_len, part_len)].push_back(i);
@@ -117,7 +117,7 @@ void sim_search_3parts(
   mid2idxs.clear();
   check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
   if (include_eye)
-    for (int i = 0; i < strings.size(); i++)
+    for (size_t i = 0; i < strings.size(); i++)
       out.insert({i, i});
 }
 

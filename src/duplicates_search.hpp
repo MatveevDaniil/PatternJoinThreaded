@@ -16,9 +16,9 @@ void duplicates_search(
   out_file.open(out_file_name);
   for (const auto& entry : str2idxs) {
     ints idxs = entry.second;
-    for (int i = 0; i < idxs.size(); i++) {
+    for (size_t i = 0; i < idxs.size(); i++) {
       out_file << idxs[i] << " " << idxs[i] << "\n";
-      for (int j = i + 1; j < idxs.size(); j++) {
+      for (size_t j = i + 1; j < idxs.size(); j++) {
         out_file << idxs[i] << " " << idxs[j] << "\n";
         out_file << idxs[j] << " " << idxs[i] << "\n";
       }

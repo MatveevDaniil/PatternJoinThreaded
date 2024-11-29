@@ -31,14 +31,15 @@ template <>
 inline std::string trimString<TrimDirection::No>(
   const std::string& str, int trim_size
 ) {
+  (void)trim_size;
   return str;
 }
 
 inline std::string trimMidLev(
   const std::string& str, const std::string& substr
 ) {
-  int part_len = str.size() / 3;
-  int residue = str.size() % 3;
+  size_t part_len = str.size() / 3;
+  size_t residue = str.size() % 3;
   if (part_len == substr.size()) {
     if (residue == 0) {
       if (str.compare(part_len, part_len, substr) == 0)
@@ -68,8 +69,8 @@ inline std::string trimMidLev(
 inline std::string trimMidHam(
   const std::string& str, const std::string& substr
 ) {
-  int part_len = str.size() / 3;
-  int residue = str.size() % 3;
+  size_t part_len = str.size() / 3;
+  size_t residue = str.size() % 3;
 
   if (part_len == substr.size()) {
     if (residue == 0)  {

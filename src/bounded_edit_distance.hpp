@@ -9,16 +9,16 @@
 bool edit_distance_k(
     std::string a, 
     std::string b, 
-    int k
+    size_t k
 );
 
 bool hamming_distance_k(
     std::string a, 
     std::string b, 
-    int k
+    size_t k
 );
 
-using distance_k_ptr = bool (*)(std::string, std::string, int);
+using distance_k_ptr = bool (*)(std::string, std::string, size_t);
 distance_k_ptr get_distance_k(char metric);
 
 #endif // BOUNDED_EDIT_DISTANCE_HPP

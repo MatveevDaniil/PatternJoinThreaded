@@ -21,11 +21,11 @@ void readFile(
   }
 
   str2idx.reserve(strings.size());
-  for (int i = 0; i < strings.size(); i++)
+  for (size_t i = 0; i < strings.size(); i++)
     str2idx[strings[i]] = i;
   if (include_duplicates) {
     str2idxs.reserve(strings.size());
-    for (int i = 0; i < strings.size(); i++)
+    for (size_t i = 0; i < strings.size(); i++)
       str2idxs[strings[i]].push_back(i);
 
   }

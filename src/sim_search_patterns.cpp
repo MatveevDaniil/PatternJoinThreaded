@@ -27,7 +27,7 @@ void sim_search_patterns(
   }
 
   if (include_eye)
-    for (int i = 0; i < strings.size(); i++)
+    for (size_t i = 0; i < strings.size(); i++)
       out.insert({i, i});
 }
 
