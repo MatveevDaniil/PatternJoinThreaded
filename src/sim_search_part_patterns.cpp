@@ -111,6 +111,7 @@ void sim_search_3parts(
       }
     }
 
+  auto start = std::chrono::high_resolution_clock::now();
   check_part<TrimDirection::Start>(strings, cutoff, metric, str2idx, start2idxs, out);
   start2idxs.clear();
   check_part<TrimDirection::Mid>(strings, cutoff, metric, str2idx, mid2idxs, out);
@@ -119,6 +120,9 @@ void sim_search_3parts(
   if (include_eye)
     for (size_t i = 0; i < strings.size(); i++)
       out.insert({i, i});
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = end - start;
+  std::cout << "check_part total: " << elapsed.count() << " s\n";
 }
 
 int sim_search_part_patterns(
