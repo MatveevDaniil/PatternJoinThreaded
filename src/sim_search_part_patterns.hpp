@@ -36,10 +36,11 @@ inline void check_part(
   }
   #pragma omp parallel 
   {
-  auto start = std::chrono::high_resolution_clock::now();
   int thread_id = omp_get_thread_num();
   int_pair_set& local_out = out_t[thread_id]; 
   #pragma omp for
+  {
+  auto start = std::chrono::high_resolution_clock::now();
   for (size_t i = 0; i < entries.size(); ++i) {
     const auto* entry = entries[i];
     int part_len = entry->first.size();
@@ -105,6 +106,7 @@ inline void check_part(
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
   printf("Thread %d took %f seconds\n", thread_id, elapsed.count());
+  }
   }
   for (const auto& local_out : out_t)
     out.insert(local_out.begin(), local_out.end());
