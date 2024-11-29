@@ -38,7 +38,6 @@ inline void check_part(
   {
   int thread_id = omp_get_thread_num();
   int_pair_set& local_out = out_t[thread_id]; 
-  auto start = std::chrono::high_resolution_clock::now();
   #pragma omp for
   for (size_t i = 0; i < entries.size(); ++i) {
     const auto* entry = entries[i];
@@ -98,13 +97,14 @@ inline void check_part(
       }
 
     } else {
+      auto start = std::chrono::high_resolution_clock::now();
       sim_search_semi_patterns_impl<trim_direction>(
         strings, cutoff, metric, str2idx, local_out, &entry->second, false, entry->first);
+      auto end = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double> elapsed = end - start;
+      printf("%d %f\n", thread_id, elapsed.count());
     }
   }
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end - start;
-  printf("Thread %d took %f seconds\n", thread_id, elapsed.count());
   }
   for (const auto& local_out : out_t)
     out.insert(local_out.begin(), local_out.end());
