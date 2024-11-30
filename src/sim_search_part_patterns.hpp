@@ -28,21 +28,16 @@ inline void check_part(
   entries.reserve(part2strings.size());
   for (auto& entry : part2strings)
     entries.push_back(&entry);
-  std::vector<int_pair_set> out_t;
-  out_t.reserve(omp_get_max_threads());
-  for (int i = 0; i < omp_get_max_threads(); ++i)
-    out_t.emplace_back();
   #pragma omp parallel 
   {
   int thread_id = omp_get_thread_num();
   double wtime = omp_get_wtime();
-  int_pair_set& local_out = out_t[thread_id]; 
   #pragma omp for nowait
   for (size_t i = 0; i < entries.size(); ++i) {
     const auto* entry = entries[i];
     int part_len = entry->first.size();
     if (entry->second.size() == 1)
-      local_out.insert({entry->second[0], entry->second[0]});
+      out.insert({entry->second[0], entry->second[0]});
     else if (entry->second.size() < 50) {
       const ints *string_indeces = &(entry->second);
       std::vector<std::string> trimmed_strings(string_indeces->size());
@@ -60,16 +55,16 @@ inline void check_part(
           std::string trim_str1 = trimmed_strings[i];
           size_t str_idx1 = string_indeces->at(i);
           std::string str1 = strings[str_idx1];
-          local_out.insert({str_idx1, str_idx1});
+          out.insert({str_idx1, str_idx1});
           for (size_t j = i + 1; j < string_indeces->size(); j++) {
             std::string trim_str2 = trimmed_strings[j];
             size_t str_idx2 = string_indeces->at(j);
             std::string str2 = strings[str_idx2];
             if (distance_k(trim_str1, trim_str2, cutoff) && distance_k(str1, str2, cutoff)) {
               if (str_idx1 > str_idx2)
-                local_out.insert({str_idx2, str_idx1});
+                out.insert({str_idx2, str_idx1});
               else
-                local_out.insert({str_idx1, str_idx2});
+                out.insert({str_idx1, str_idx2});
             }
           }
         }
@@ -80,15 +75,15 @@ inline void check_part(
         for (size_t i = 0; i < string_indeces->size(); i++) {
           std::string trim_str1 = trimmed_strings[i];
           size_t str_idx1 = string_indeces->at(i);
-          local_out.insert({str_idx1, str_idx1});
+          out.insert({str_idx1, str_idx1});
           for (size_t j = i + 1; j < string_indeces->size(); j++) {
             std::string trim_str2 = trimmed_strings[j];
             size_t str_idx2 = string_indeces->at(j);
             if (distance_k(trim_str1, trim_str2, cutoff)) {
               if (str_idx1 > str_idx2)
-                local_out.insert({str_idx2, str_idx1});
+                out.insert({str_idx2, str_idx1});
               else
-                local_out.insert({str_idx1, str_idx2});
+                out.insert({str_idx1, str_idx2});
             }
           }
         }
@@ -96,14 +91,12 @@ inline void check_part(
 
     } else {
       sim_search_semi_patterns_impl<trim_direction>(
-        strings, cutoff, metric, str2idx, local_out, &entry->second, false, entry->first);
+        strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
     }
   }
   wtime = omp_get_wtime() - wtime;
   printf("thread=%d: %f\n", thread_id, wtime);
   }
-  for (const auto& local_out : out_t)
-    out.insert(local_out.begin(), local_out.end());
 }
 
 int sim_search_part_patterns(
