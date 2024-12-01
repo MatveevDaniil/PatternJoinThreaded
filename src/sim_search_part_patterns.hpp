@@ -90,8 +90,12 @@ inline void check_part(
       }
 
     } else {
+      auto start = std::chrono::high_resolution_clock::now();
       sim_search_semi_patterns_impl<trim_direction>(
         strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
+      auto end = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double> elapsed_seconds = end - start;
+      printf("t=%d: %f\n", thread_id, elapsed_seconds.count());
     }
   }
   wtime = omp_get_wtime() - wtime;
