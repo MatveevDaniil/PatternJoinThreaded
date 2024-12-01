@@ -32,37 +32,41 @@ void sim_search_semi_patterns_impl(
 
   if (trim_direction == TrimDirection::No || trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
     #pragma omp parallel for schedule(dynamic,10)
-    for (size_t indeces_ptr_idx = 0; indeces_ptr_idx < values.size(); indeces_ptr_idx++) {
-      auto indeces_ptr = values[indeces_ptr_idx];
-      if (indeces_ptr->size() > 1)
-        for (auto str_idx1 = indeces_ptr->begin(); str_idx1 != indeces_ptr->end(); ++str_idx1) {
-          std::string str1 = strings[*str_idx1];
-          for (auto str_idx2 = str_idx1 + 1; str_idx2 != indeces_ptr->end(); ++str_idx2)
-            if (distance_k(str1, strings[*str_idx2], cutoff)) {
-              if (*str_idx1 > *str_idx2)
-                out.insert({*str_idx2, *str_idx1});
-              else
-                out.insert({*str_idx1, *str_idx2});
-            }
-        }
+    {
+      for (size_t indeces_ptr_idx = 0; indeces_ptr_idx < values.size(); indeces_ptr_idx++) {
+        auto indeces_ptr = values[indeces_ptr_idx];
+        if (indeces_ptr->size() > 1)
+          for (auto str_idx1 = indeces_ptr->begin(); str_idx1 != indeces_ptr->end(); ++str_idx1) {
+            std::string str1 = strings[*str_idx1];
+            for (auto str_idx2 = str_idx1 + 1; str_idx2 != indeces_ptr->end(); ++str_idx2)
+              if (distance_k(str1, strings[*str_idx2], cutoff)) {
+                if (*str_idx1 > *str_idx2)
+                  out.insert({*str_idx2, *str_idx1});
+                else
+                  out.insert({*str_idx1, *str_idx2});
+              }
+          }
+      }
     }
   } else {
-    #pragma omp parallel for schedule(dynamic,10)
-    for (size_t indeces_ptr_idx = 0; indeces_ptr_idx < values.size(); indeces_ptr_idx++) {
-      auto indeces_ptr = values[indeces_ptr_idx];
-      if (indeces_ptr->size() > 1)
-        for (auto str_idx1 = indeces_ptr->begin(); str_idx1 != indeces_ptr->end(); ++str_idx1) {
-          std::string str1 = trimString<trim_direction>(strings[*str_idx1], trim_size);
-          for (auto str_idx2 = str_idx1 + 1; str_idx2 != indeces_ptr->end(); ++str_idx2) {
-            std::string str2 = trimString<trim_direction>(strings[*str_idx2], trim_size);
-            if (distance_k(str1, str2, cutoff)) {
-              if (*str_idx1 > *str_idx2)
-                out.insert({*str_idx2, *str_idx1});
-              else
-                out.insert({*str_idx1, *str_idx2});
+    #pragma omp parallel for schedule(dynamic,10) 
+    {
+      for (size_t indeces_ptr_idx = 0; indeces_ptr_idx < values.size(); indeces_ptr_idx++) {
+        auto indeces_ptr = values[indeces_ptr_idx];
+        if (indeces_ptr->size() > 1)
+          for (auto str_idx1 = indeces_ptr->begin(); str_idx1 != indeces_ptr->end(); ++str_idx1) {
+            std::string str1 = trimString<trim_direction>(strings[*str_idx1], trim_size);
+            for (auto str_idx2 = str_idx1 + 1; str_idx2 != indeces_ptr->end(); ++str_idx2) {
+              std::string str2 = trimString<trim_direction>(strings[*str_idx2], trim_size);
+              if (distance_k(str1, str2, cutoff)) {
+                if (*str_idx1 > *str_idx2)
+                  out.insert({*str_idx2, *str_idx1});
+                else
+                  out.insert({*str_idx1, *str_idx2});
+              }
             }
           }
-        }
+      }
     }
   }
 
