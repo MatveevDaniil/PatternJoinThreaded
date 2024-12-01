@@ -49,7 +49,7 @@ inline void check_part(
         } else
           for (size_t i = 0; i < string_indeces->size(); i++)
             trimmed_strings[i] = trimString<trim_direction>(strings[string_indeces->at(i)], part_len);
-        #pragma omp for collapse(2)
+        #pragma omp for collapse(2) nowait
         for (size_t i = 0; i < string_indeces->size(); i++) {
           for (size_t j = i; j < string_indeces->size(); j++) {
             std::string trim_str1 = trimmed_strings[i];
