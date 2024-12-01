@@ -31,7 +31,7 @@ void sim_search_semi_patterns_impl(
     values.push_back(&entry.second);
 
   if (trim_direction == TrimDirection::No || trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
-    #pragma omp parallel for schedule(dynamic,10)
+    #pragma omp parallel
     {
       #pragma omp for schedule(dynamic,10) 
       for (size_t indeces_ptr_idx = 0; indeces_ptr_idx < values.size(); indeces_ptr_idx++) {
