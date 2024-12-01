@@ -32,7 +32,6 @@ inline void check_part(
   {
   int thread_id = omp_get_thread_num();
   double wtime = omp_get_wtime();
-  #pragma omp for schedule(runtime) nowait
   for (size_t i = 0; i < entries.size(); ++i) {
     const auto* entry = entries[i];
     int part_len = entry->first.size();
@@ -50,13 +49,14 @@ inline void check_part(
         } else
           for (size_t i = 0; i < string_indeces->size(); i++)
             trimmed_strings[i] = trimString<trim_direction>(strings[string_indeces->at(i)], part_len);
-
+        #pragma omp for collapse(2)
         for (size_t i = 0; i < string_indeces->size(); i++) {
-          std::string trim_str1 = trimmed_strings[i];
-          size_t str_idx1 = string_indeces->at(i);
-          std::string str1 = strings[str_idx1];
-          out.insert({str_idx1, str_idx1});
-          for (size_t j = i + 1; j < string_indeces->size(); j++) {
+          for (size_t j = i; j < string_indeces->size(); j++) {
+            std::string trim_str1 = trimmed_strings[i];
+            size_t str_idx1 = string_indeces->at(i);
+            std::string str1 = strings[str_idx1];
+            if (i == j)
+              out.insert({str_idx1, str_idx1});
             std::string trim_str2 = trimmed_strings[j];
             size_t str_idx2 = string_indeces->at(j);
             std::string str2 = strings[str_idx2];
@@ -71,12 +71,13 @@ inline void check_part(
       } else {
         for (size_t i = 0; i < string_indeces->size(); i++)
           trimmed_strings[i] = trimString<trim_direction>(strings[string_indeces->at(i)], part_len);
-        
+        #pragma omp for collapse(2)
         for (size_t i = 0; i < string_indeces->size(); i++) {
-          std::string trim_str1 = trimmed_strings[i];
-          size_t str_idx1 = string_indeces->at(i);
-          out.insert({str_idx1, str_idx1});
-          for (size_t j = i + 1; j < string_indeces->size(); j++) {
+          for (size_t j = i; j < string_indeces->size(); j++) {
+            std::string trim_str1 = trimmed_strings[i];
+            size_t str_idx1 = string_indeces->at(i);
+            if (i == j)
+              out.insert({str_idx1, str_idx1});
             std::string trim_str2 = trimmed_strings[j];
             size_t str_idx2 = string_indeces->at(j);
             if (distance_k(trim_str1, trim_str2, cutoff)) {

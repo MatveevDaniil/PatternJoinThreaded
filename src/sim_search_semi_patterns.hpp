@@ -26,33 +26,33 @@ void sim_search_semi_patterns_impl(
   distance_k_ptr distance_k = get_distance_k(metric);
 
   if (trim_direction == TrimDirection::No || trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
+    #pragma omp for collapse(2)
     for (auto entry = pat2str.begin(); entry != pat2str.end(); entry++)
-      if (entry->second.size() > 1)
-        for (auto str_idx1 = entry->second.begin(); str_idx1 != entry->second.end(); ++str_idx1) {
-          std::string str1 = strings[*str_idx1];
-          for (auto str_idx2 = str_idx1 + 1; str_idx2 != entry->second.end(); ++str_idx2)
-            if (distance_k(str1, strings[*str_idx2], cutoff)) {
-              if (*str_idx1 > *str_idx2)
-                out.insert({*str_idx2, *str_idx1});
-              else
-                out.insert({*str_idx1, *str_idx2});
-            }
-        }
+      for (auto str_idx1 = entry->second.begin(); str_idx1 != entry->second.end(); ++str_idx1) {
+        std::string str1 = strings[*str_idx1];
+        for (auto str_idx2 = str_idx1 + 1; str_idx2 != entry->second.end(); ++str_idx2)
+          if (distance_k(str1, strings[*str_idx2], cutoff)) {
+            if (*str_idx1 > *str_idx2)
+              out.insert({*str_idx2, *str_idx1});
+            else
+              out.insert({*str_idx1, *str_idx2});
+          }
+      }
   } else {
+    #pragma omp for collapse(2)
     for (auto entry = pat2str.begin(); entry != pat2str.end(); entry++)
-      if (entry->second.size() > 1)
-        for (auto str_idx1 = entry->second.begin(); str_idx1 != entry->second.end(); ++str_idx1) {
-          std::string str1 = trimString<trim_direction>(strings[*str_idx1], trim_size);
-          for (auto str_idx2 = str_idx1 + 1; str_idx2 != entry->second.end(); ++str_idx2) {
-            std::string str2 = trimString<trim_direction>(strings[*str_idx2], trim_size);
-            if (distance_k(str1, str2, cutoff)) {
-              if (*str_idx1 > *str_idx2)
-                out.insert({*str_idx2, *str_idx1});
-              else
-                out.insert({*str_idx1, *str_idx2});
-            }
+      for (auto str_idx1 = entry->second.begin(); str_idx1 != entry->second.end(); ++str_idx1) {
+        std::string str1 = trimString<trim_direction>(strings[*str_idx1], trim_size);
+        for (auto str_idx2 = str_idx1 + 1; str_idx2 != entry->second.end(); ++str_idx2) {
+          std::string str2 = trimString<trim_direction>(strings[*str_idx2], trim_size);
+          if (distance_k(str1, str2, cutoff)) {
+            if (*str_idx1 > *str_idx2)
+              out.insert({*str_idx2, *str_idx1});
+            else
+              out.insert({*str_idx1, *str_idx2});
           }
         }
+      }
   }
 
   if (include_eye)
