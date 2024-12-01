@@ -52,11 +52,13 @@ inline void check_part(
         #pragma omp for collapse(2)
         for (size_t i = 0; i < string_indeces->size(); i++) {
           for (size_t j = i; j < string_indeces->size(); j++) {
+            if (i == j) {
+              out.insert({str_idx1, str_idx1});
+              continue;
+            }
             std::string trim_str1 = trimmed_strings[i];
             size_t str_idx1 = string_indeces->at(i);
             std::string str1 = strings[str_idx1];
-            if (i == j)
-              out.insert({str_idx1, str_idx1});
             std::string trim_str2 = trimmed_strings[j];
             size_t str_idx2 = string_indeces->at(j);
             std::string str2 = strings[str_idx2];
@@ -74,10 +76,12 @@ inline void check_part(
         #pragma omp for collapse(2)
         for (size_t i = 0; i < string_indeces->size(); i++) {
           for (size_t j = i; j < string_indeces->size(); j++) {
+            if (i == j) {
+              out.insert({str_idx1, str_idx1});
+              continue;
+            }
             std::string trim_str1 = trimmed_strings[i];
             size_t str_idx1 = string_indeces->at(i);
-            if (i == j)
-              out.insert({str_idx1, str_idx1});
             std::string trim_str2 = trimmed_strings[j];
             size_t str_idx2 = string_indeces->at(j);
             if (distance_k(trim_str1, trim_str2, cutoff)) {
@@ -91,12 +95,12 @@ inline void check_part(
       }
 
     } else {
-      auto start = std::chrono::high_resolution_clock::now();
+      // auto start = std::chrono::high_resolution_clock::now();
       sim_search_semi_patterns_impl<trim_direction>(
         strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
-      auto end = std::chrono::high_resolution_clock::now();
-      std::chrono::duration<double> elapsed_seconds = end - start;
-      printf("s=%ld t=%d: %f\n", entry->second.size(), thread_id, elapsed_seconds.count());
+      // auto end = std::chrono::high_resolution_clock::now();
+      // std::chrono::duration<double> elapsed_seconds = end - start;
+      // printf("s=%ld t=%d: %f\n", entry->second.size(), thread_id, elapsed_seconds.count());
     }
   }
   wtime = omp_get_wtime() - wtime;
