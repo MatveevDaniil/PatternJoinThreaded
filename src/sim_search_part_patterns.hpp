@@ -26,7 +26,6 @@ inline void check_part(
   distance_k_ptr distance_k = get_distance_k(metric);
   std::vector<std::pair<std::string, ints>*> entries_small;
   std::vector<std::pair<std::string, ints>*> entries_large;
-  entries.reserve(part2strings.size());
   for (auto& entry : part2strings)
     if (entry.second.size() < 500)
       entries_small.push_back(&entry);
@@ -107,7 +106,7 @@ inline void check_part(
   // PROCESS LARGE ENTRIES USING INTERNAL THREADING
   auto start = std::chrono::high_resolution_clock::now();
   for (size_t i = 0; i < entries_large.size(); i++) {
-    const auto* entry = entries_small[i];
+    const auto* entry = entries_large[i];
     sim_search_semi_patterns_impl<trim_direction>(
       strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
   }
