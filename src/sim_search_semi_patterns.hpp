@@ -26,7 +26,7 @@ void sim_search_semi_patterns_impl(
   distance_k_ptr distance_k = get_distance_k(metric);
 
   if (trim_direction == TrimDirection::No || trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
-    #pragma omp for schedule(guided) nowait
+    #pragma omp parallel for schedule(guided)
     for (auto entry = pat2str.begin(); entry != pat2str.end(); entry++)
       if (entry->second.size() > 1)
         for (auto str_idx1 = entry->second.begin(); str_idx1 != entry->second.end(); ++str_idx1) {
@@ -40,7 +40,7 @@ void sim_search_semi_patterns_impl(
             }
         }
   } else {
-    #pragma omp for schedule(guided)
+    #pragma omp parallel for schedule(guided)
     for (auto entry = pat2str.begin(); entry != pat2str.end(); entry++)
       if (entry->second.size() > 1)
         for (auto str_idx1 = entry->second.begin(); str_idx1 != entry->second.end(); ++str_idx1) {

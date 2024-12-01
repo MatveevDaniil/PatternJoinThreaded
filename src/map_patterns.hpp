@@ -1,6 +1,7 @@
 #ifndef MAP_PATTERNS_HPP
 #define MAP_PATTERNS_HPP
 
+#include <omp.h>
 #include <vector>
 #include <string>
 #include "patterns_generators.hpp"
@@ -23,24 +24,29 @@ void map_patterns(
   int trim_size = trim_part.size();
 
   if (strings_subset == nullptr)
+    #pragma omp parallel for schedule(guided)
     for (std::string str: strings)
       for (const auto& pattern: PatternFunc(str, nullptr)) 
         pat2str[pattern].push_back(str2idx[str]);
   else {
     if (trim_direction == TrimDirection::No)
+      #pragma omp parallel for schedule(guided)
       for (int str_idx: *strings_subset)
         for (const auto& pattern: PatternFunc(strings[str_idx], nullptr)) 
           pat2str[pattern].push_back(str_idx);
     else if (trim_direction == TrimDirection::Mid) {
       MidTrimFunc midTrim = getMidTrimFunc(metric_type);
+      #pragma omp parallel for schedule(guided)
       for (int str_idx: *strings_subset)
         for (const auto& pattern: PatternFunc(midTrim(strings[str_idx], trim_part), nullptr)) 
           pat2str[pattern].push_back(str_idx);
     }
-    else
+    else {
+      #pragma omp parallel for schedule(guided)
       for (int str_idx: *strings_subset)
         for (const auto& pattern: PatternFunc(trimString<trim_direction>(strings[str_idx], trim_size), nullptr)) 
           pat2str[pattern].push_back(str_idx);
+    }
   }
 }
 

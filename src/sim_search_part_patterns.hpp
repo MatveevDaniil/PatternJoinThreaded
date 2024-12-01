@@ -24,20 +24,26 @@ inline void check_part(
   int_pair_set& out
 ) {
   distance_k_ptr distance_k = get_distance_k(metric);
-  std::vector<std::pair<std::string, ints>*> entries;
+  std::vector<std::pair<std::string, ints>*> entries_small;
+  std::vector<std::pair<std::string, ints>*> entries_large;
   entries.reserve(part2strings.size());
   for (auto& entry : part2strings)
-    entries.push_back(&entry);
+    if (entry.second.size() < 500)
+      entries_small.push_back(&entry);
+    else
+      entries_large.push_back(&entry);
+  
+  // PROCESS SMALL ENTRIES USING GUIDED SCHEDULING
   #pragma omp parallel 
   {
-  int thread_id = omp_get_thread_num();
   double wtime = omp_get_wtime();
-  for (size_t i = 0; i < entries.size(); ++i) {
-    const auto* entry = entries[i];
+  #pragma omp for schedule(guided)
+  for (size_t i = 0; i < entries_small.size(); ++i) {
+    const auto* entry = entries_small[i];
     int part_len = entry->first.size();
     if (entry->second.size() == 1)
       out.insert({entry->second[0], entry->second[0]});
-    else if (entry->second.size() < 50) {
+    else {
       const ints *string_indeces = &(entry->second);
       std::vector<std::string> trimmed_strings(string_indeces->size());
 
@@ -49,7 +55,6 @@ inline void check_part(
         } else
           for (size_t i = 0; i < string_indeces->size(); i++)
             trimmed_strings[i] = trimString<trim_direction>(strings[string_indeces->at(i)], part_len);
-        #pragma omp for collapse(2) nowait
         for (size_t i = 0; i < string_indeces->size(); i++) {
           for (size_t j = i; j < string_indeces->size(); j++) {
             std::string trim_str1 = trimmed_strings[i];
@@ -73,7 +78,6 @@ inline void check_part(
       } else {
         for (size_t i = 0; i < string_indeces->size(); i++)
           trimmed_strings[i] = trimString<trim_direction>(strings[string_indeces->at(i)], part_len);
-        #pragma omp for collapse(2)
         for (size_t i = 0; i < string_indeces->size(); i++) {
           for (size_t j = i; j < string_indeces->size(); j++) {
             std::string trim_str1 = trimmed_strings[i];
@@ -94,18 +98,22 @@ inline void check_part(
         }
       }
 
-    } else {
-      // auto start = std::chrono::high_resolution_clock::now();
-      sim_search_semi_patterns_impl<trim_direction>(
-        strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
-      // auto end = std::chrono::high_resolution_clock::now();
-      // std::chrono::duration<double> elapsed_seconds = end - start;
-      // printf("s=%ld t=%d: %f\n", entry->second.size(), thread_id, elapsed_seconds.count());
-    }
+    } 
   }
   wtime = omp_get_wtime() - wtime;
-  printf("thread=%d: %f\n", thread_id, wtime);
+  printf("thread_small=%d: %f\n", thread_id, wtime);
   }
+
+  // PROCESS LARGE ENTRIES USING INTERNAL THREADING
+  auto start = std::chrono::high_resolution_clock::now();
+  for (size_t i = 0; i < entries_large.size(); i++) {
+    const auto* entry = entries_small[i];
+    sim_search_semi_patterns_impl<trim_direction>(
+      strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
+  }
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
+  printf("large: %f\n", elapsed_seconds.count());
 }
 
 int sim_search_part_patterns(
