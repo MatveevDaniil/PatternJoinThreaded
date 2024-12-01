@@ -7,7 +7,7 @@
 
 using str2int = ankerl::unordered_dense::map<std::string, int>;
 using ints = gch::small_vector<int>;
-using str2ints = ankerl::parallel_flat_hash_map::map<std::string, ints>;
+using str2ints = gtl::parallel_flat_hash_map_m<std::string, ints>;
 // using str2ints = gtl::parallel_flat_hash_map<std::string, ints>;
 using int_pair_set = gtl::parallel_flat_hash_set_m<std::pair<int, int>>;
 // using int_pair_set = ankerl::unordered_dense::set<std::pair<int, int>>;
