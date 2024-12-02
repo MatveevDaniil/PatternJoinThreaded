@@ -110,8 +110,12 @@ inline void check_part(
   // PROCESS LARGE ENTRIES USING INTERNAL THREADING
   for (size_t i = 0; i < entries_large.size(); i++) {
     const auto* entry = entries_large[i];
+          auto start = std::chrono::high_resolution_clock::now();
     sim_search_semi_patterns_omp_impl<trim_direction>(
       strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
+          auto end = std::chrono::high_resolution_clock::now();
+          std::chrono::duration<double> elapsed_seconds = end - start;
+          printf("large total=%d: %f\n", i, elapsed_seconds.count());
   }
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;

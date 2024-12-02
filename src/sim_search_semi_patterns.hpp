@@ -20,12 +20,17 @@ void sim_search_semi_patterns_omp_impl(
   bool include_eye = true,
   const std::string &trim_part = ""
 ) {
+          atuo start = std::chrono::high_resolution_clock::now();
   str_int_set pat_str;
   str2ints pat2str;
   int trim_size = trim_part.size();
   map_patterns_omp<trim_direction>(strings, cutoff, 'S', str2idx, strings_subset, pat_str, trim_part, metric);
+          auto end = std::chrono::high_resolution_clock::now();
+          std::chrono::duration<double> elapsed_seconds = end - start;
+          printf("patterns mapping=%d: %f\n", thread_id, elapsed_seconds.count());
   distance_k_ptr distance_k = get_distance_k(metric);
 
+  start = std::chrono::high_resolution_clock::now();
   if (trim_direction == TrimDirection::No || trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
     for (auto entry : pat_str) {
       int str_idx2 = entry.second;
@@ -59,6 +64,9 @@ void sim_search_semi_patterns_omp_impl(
   if (include_eye)
     for (size_t i = 0; i < strings.size(); i++)
       out.insert({i, i});
+            end = std::chrono::high_resolution_clock::now();
+            elapsed_seconds = end - start;
+            printf("patterns iteration=%d: %f\n", thread_id, elapsed_seconds.count());
 }
 
 template <TrimDirection trim_direction>
