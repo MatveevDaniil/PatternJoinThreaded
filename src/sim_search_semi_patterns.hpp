@@ -21,7 +21,7 @@ void sim_search_semi_patterns_omp_impl(
   const std::string &trim_part = ""
 ) {
           auto start = std::chrono::high_resolution_clock::now();
-  str_int_set pat_str;
+  str_int_queue pat_str;
   str2ints pat2str;
   int trim_size = trim_part.size();
   map_patterns_omp<trim_direction>(strings, cutoff, 'S', str2idx, strings_subset, pat_str, trim_part, metric);
@@ -32,7 +32,8 @@ void sim_search_semi_patterns_omp_impl(
 
   start = std::chrono::high_resolution_clock::now();
   if (trim_direction == TrimDirection::No || trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
-    for (auto entry : pat_str) {
+    std::pair<std::string, int> entry;
+    while (pat_str.try_dequeue(entry)) {
       int str_idx2 = entry.second;
       ints& indices = pat2str[entry.first];
       if (indices.size() < 1) {
@@ -45,14 +46,15 @@ void sim_search_semi_patterns_omp_impl(
       indices.push_back(str_idx2);
     }
   } else {
-    for (auto entry : pat_str) {
+    std::pair<std::string, int> entry;
+    while (pat_str.try_dequeue(entry)) {
       int str_idx2 = entry.second;
       ints& indices = pat2str[entry.first];
       if (indices.size() < 1) {
         indices.push_back(str_idx2);
         continue;
       }
-      std::string str2 =  trimString<trim_direction>(strings[str_idx2], trim_size);
+      std::string str2 = trimString<trim_direction>(strings[str_idx2], trim_size);
       for (auto str_idx1 : indices) {
         std::string str1 = trimString<trim_direction>(strings[str_idx1], trim_size);
         if (distance_k(str1, str2, cutoff)) 

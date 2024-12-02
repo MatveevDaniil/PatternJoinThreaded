@@ -9,6 +9,7 @@
 using str2int = ankerl::unordered_dense::map<std::string, int>;
 using ints = gch::small_vector<int>;
 using str2ints = ankerl::unordered_dense::map<std::string, ints>;
+using str_int_queue = moodycamel::ConcurrentQueue<std::pair<std::string, int>>;
 // using str2ints = gtl::parallel_flat_hash_map<std::string, ints>;
 using str_int_set = gtl::parallel_flat_hash_set_m<std::pair<std::string, int>>;
 using int_pair_set = gtl::parallel_flat_hash_set_m<std::pair<int, int>>;
