@@ -79,7 +79,7 @@ void sim_search_semi_patterns_impl(
       }
     }
   }
-  str2intqueue.clear();
+  str2intqueue->clear();
   end = std::chrono::high_resolution_clock::now();
   elapsed_seconds = end - start;
   printf("pat2str iteration time: %f\n", elapsed_seconds.count());
