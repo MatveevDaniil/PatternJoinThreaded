@@ -9,25 +9,21 @@ void sim_search_patterns(
   ints* strings_subset,
   bool include_eye
 ) {
-  str2intqueue pat2str;
-  map_patterns<TrimDirection::No>(strings, cutoff, metric, str2idx, strings_subset, pat2str);
+  str_int_set pat_str;
+  map_patterns<TrimDirection::No>(strings, cutoff, metric, str2idx, strings_subset, pat_str);
+  str2ints pat2str;
 
-  for (auto entry = pat2str.begin(); entry != pat2str.end(); entry++) {
-    ints indeces;
-    int idx;
-    while (entry->second.try_dequeue(idx))
-      indeces.push_back(idx);
-    if (indeces.size() < 2)
-      continue;
+  for (auto entry = pat_str.begin(); entry != pat_str.end(); entry++) {
+    str_idx2 = entry->second;
+    ints indeces& = pat2str[entry->first];
     for (auto str_idx1 = indeces.begin(); str_idx1 != indeces.end(); ++str_idx1) {
-      for (auto str_idx2 = str_idx1 + 1; str_idx2 != indeces.end(); ++str_idx2) {
-        if (*str_idx1 > *str_idx2) {
-          out.insert({*str_idx2, *str_idx1});
-        } else {  
-          out.insert({*str_idx1, *str_idx2});
-        }
+      if (*str_idx1 > str_idx2) {
+        out.insert({str_idx2, *str_idx1});
+      } else {  
+        out.insert({*str_idx1, str_idx2});
       }
     }
+    indices.push_back(str_idx2);
   }
 
   if (include_eye)
