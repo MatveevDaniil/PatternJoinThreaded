@@ -106,15 +106,15 @@ inline void check_part(
   }
 
   // PROCESS LARGE ENTRIES USING INTERNAL THREADING
-  auto start = std::chrono::high_resolution_clock::now();
   for (size_t i = 0; i < entries_large.size(); i++) {
+    auto start = std::chrono::high_resolution_clock::now();
     const auto* entry = entries_large[i];
     sim_search_semi_patterns_impl<trim_direction>(
       strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    printf("total: %f\n", elapsed_seconds.count());
   }
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed_seconds = end - start;
-  printf("large: %f\n", elapsed_seconds.count());
 }
 
 int sim_search_part_patterns(
