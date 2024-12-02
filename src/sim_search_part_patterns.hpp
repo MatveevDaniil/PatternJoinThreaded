@@ -115,7 +115,7 @@ inline void check_part(
       strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
           auto end = std::chrono::high_resolution_clock::now();
           std::chrono::duration<double> elapsed_seconds = end - start;
-          printf("large total=%d: %f\n", i, elapsed_seconds.count());
+          printf("large total=%ld: %f\n", i, elapsed_seconds.count());
   }
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
