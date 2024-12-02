@@ -28,7 +28,7 @@ inline void check_part(
   std::vector<std::pair<const std::string, ints>*> entries_small;
   std::vector<std::pair<const std::string, ints>*> entries_large;
   for (auto& entry : part2strings)
-    if (entry.second.size() < 5000)
+    if (entry.second.size() < 10000)
       entries_small.push_back(&entry);
     else
       entries_large.push_back(&entry);
