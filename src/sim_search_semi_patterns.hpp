@@ -22,9 +22,14 @@ void sim_search_semi_patterns_impl(
 ) {
   str2intqueue pat2str;
   int trim_size = trim_part.size();
+  auto start = std::chrono::high_resolution_clock::now();
   map_patterns<trim_direction>(strings, cutoff, 'S', str2idx, strings_subset, pat2str, trim_part, metric);
   distance_k_ptr distance_k = get_distance_k(metric);
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
+  printf("map_patterns: %f\n", elapsed_seconds.count());
 
+  start = std::chrono::high_resolution_clock::now();
   std::vector<intqueue*> idx_queues;
   idx_queues.reserve(pat2str.size());
   for (auto& entry : pat2str)
@@ -74,7 +79,9 @@ void sim_search_semi_patterns_impl(
       }
     }
   }
-
+  end = std::chrono::high_resolution_clock::now();
+  elapsed_seconds = end - start;
+  printf("pat2str iteration time: %f\n", elapsed_seconds.count());
   if (include_eye)
     for (size_t i = 0; i < strings.size(); i++)
       out.insert({i, i});
