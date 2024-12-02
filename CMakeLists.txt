@@ -15,6 +15,7 @@ endif()
 
 find_package(OpenMP REQUIRED)
 
+
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(OBJ_DIR "${CMAKE_CURRENT_BINARY_DIR}/obj")
 

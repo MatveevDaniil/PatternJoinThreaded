@@ -4,6 +4,7 @@
 #include <omp.h>
 #include <vector>
 #include <string>
+#include <mutex>
 #include "patterns_generators.hpp"
 #include "hash_containers.hpp"
 #include "trim_strings.hpp"
@@ -16,7 +17,7 @@ void map_patterns(
   char pattern_type,
   str2int& str2idx,
   const ints* strings_subset,
-  str2ints& pat2str,
+  str2intqueue& pat2str,
   const std::string& trim_part = "",
   const char metric_type = 'L'
 ) {
@@ -28,27 +29,27 @@ void map_patterns(
   if (strings_subset == nullptr) {
     #pragma omp for
     for (std::string str: strings)
-      for (const auto& pattern: PatternFunc(str, nullptr)) 
-        pat2str[pattern].push_back(str2idx[str]);
+      for (const auto& pattern: PatternFunc(str, nullptr))
+        pat2str[pattern].enqueue(str2idx[str]);
   }
   else {
     if (trim_direction == TrimDirection::No) {
       #pragma omp for
       for (int str_idx: *strings_subset)
         for (const auto& pattern: PatternFunc(strings[str_idx], nullptr)) 
-          pat2str[pattern].push_back(str_idx);
+          pat2str[pattern].enqueue(str_idx);
     }
     else if (trim_direction == TrimDirection::Mid) {
       MidTrimFunc midTrim = getMidTrimFunc(metric_type);
       #pragma omp for
       for (int str_idx: *strings_subset)
         for (const auto& pattern: PatternFunc(midTrim(strings[str_idx], trim_part), nullptr)) 
-          pat2str[pattern].push_back(str_idx);
+          pat2str[pattern].enqueue(str_idx);
     } else {
       #pragma omp for
       for (int str_idx: *strings_subset)
         for (const auto& pattern: PatternFunc(trimString<trim_direction>(strings[str_idx], trim_size), nullptr)) 
-          pat2str[pattern].push_back(str_idx);
+          pat2str[pattern].enqueue(str_idx);
     }
   }
   }
