@@ -33,30 +33,30 @@ void sim_search_semi_patterns_impl(
 
   if (trim_direction == TrimDirection::No || trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
     for (auto entry : pat_str) {
-      str_idx2 = entry->second;
-      ints indeces& = pat2str[entry->first];
-      if (indeces.size() < 1) {
+      int str_idx2 = entry.second;
+      ints& indices = pat2str[entry.first];
+      if (indices.size() < 1) {
         indices.push_back(str_idx2);
         continue;
       }
-      for (auto str_idx1 : indeces)
+      for (auto str_idx1 : indices)
         if (distance_k(strings[str_idx1], strings[str_idx2], cutoff))
-          out.insert(str_idx1 > str_idx2 ? {str_idx2, str_idx1} : {str_idx1, str_idx2});
+          out.insert(str_idx1 > str_idx2 ? std::make_pair(str_idx2, str_idx1) : std::make_pair(str_idx1, str_idx2));
       indices.push_back(str_idx2);
     }
   } else {
     for (auto entry : pat_str) {
-      str_idx2 = entry->second;
-      ints indeces& = pat2str[entry->first];
-      if (indeces.size() < 1) {
+      int str_idx2 = entry.second;
+      ints& indices = pat2str[entry.first];
+      if (indices.size() < 1) {
         indices.push_back(str_idx2);
         continue;
       }
       std::string str2 =  trimString<trim_direction>(strings[str_idx2], trim_size);
-      for (auto str_idx1 : indeces) {
+      for (auto str_idx1 : indices) {
         std::string str1 = trimString<trim_direction>(strings[str_idx1], trim_size);
         if (distance_k(str1, str2, cutoff)) 
-          out.insert(str_idx1 > str_idx2 ? {str_idx2, str_idx1} : {str_idx1, str_idx2});
+          out.insert(str_idx1 > str_idx2 ? std::make_pair(str_idx2, str_idx1) : std::make_pair(str_idx1, str_idx2));
       }
       indices.push_back(str_idx2);
     }

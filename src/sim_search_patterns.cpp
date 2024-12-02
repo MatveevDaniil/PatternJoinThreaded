@@ -13,10 +13,10 @@ void sim_search_patterns(
   map_patterns<TrimDirection::No>(strings, cutoff, metric, str2idx, strings_subset, pat_str);
   str2ints pat2str;
 
-  for (auto entry = pat_str.begin(); entry != pat_str.end(); entry++) {
-    str_idx2 = entry->second;
-    ints indeces& = pat2str[entry->first];
-    for (auto str_idx1 = indeces.begin(); str_idx1 != indeces.end(); ++str_idx1) {
+  for (auto entry : pat_str) {
+    int str_idx2 = entry.second;
+    ints& indices = pat2str[entry.first];
+    for (auto str_idx1 = indices.begin(); str_idx1 != indices.end(); ++str_idx1) {
       if (*str_idx1 > str_idx2) {
         out.insert({str_idx2, *str_idx1});
       } else {  
