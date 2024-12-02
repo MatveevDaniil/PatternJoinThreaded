@@ -10,7 +10,7 @@ void sim_search_patterns(
   bool include_eye
 ) {
   str_int_set pat_str;
-  map_patterns<TrimDirection::No>(strings, cutoff, metric, str2idx, strings_subset, pat_str);
+  map_patterns_omp<TrimDirection::No>(strings, cutoff, metric, str2idx, strings_subset, pat_str);
   str2ints pat2str;
 
   for (auto entry : pat_str) {

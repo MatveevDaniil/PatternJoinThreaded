@@ -28,7 +28,7 @@ inline void check_part(
   std::vector<std::pair<const std::string, ints>*> entries_small;
   std::vector<std::pair<const std::string, ints>*> entries_large;
   for (auto& entry : part2strings)
-    if (entry.second.size() < 500)
+    if (entry.second.size() < 5000)
       entries_small.push_back(&entry);
     else
       entries_large.push_back(&entry);
@@ -44,10 +44,9 @@ inline void check_part(
     int part_len = entry->first.size();
     if (entry->second.size() == 1)
       out.insert({entry->second[0], entry->second[0]});
-    else {
+    else if (entry->second.size() < 50) {
       const ints *string_indeces = &(entry->second);
       std::vector<std::string> trimmed_strings(string_indeces->size());
-
       if (trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
         if (trim_direction == TrimDirection::Mid) {
           MidTrimFunc midTrim = getMidTrimFunc(metric);
@@ -97,24 +96,26 @@ inline void check_part(
             }
           }
         }
-      }
-
-    } 
+      } 
+    } else {
+      sim_search_semi_patterns_impl<trim_direction>(
+        strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
+    }
   }
   wtime = omp_get_wtime() - wtime;
   printf("thread_small=%d: %f\n", thread_id, wtime);
   }
 
+  auto start = std::chrono::high_resolution_clock::now();
   // PROCESS LARGE ENTRIES USING INTERNAL THREADING
   for (size_t i = 0; i < entries_large.size(); i++) {
-    auto start = std::chrono::high_resolution_clock::now();
     const auto* entry = entries_large[i];
-    sim_search_semi_patterns_impl<trim_direction>(
+    sim_search_semi_patterns_omp_impl<trim_direction>(
       strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> elapsed_seconds = end - start;
-    printf("total: %f\n", elapsed_seconds.count());
   }
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
+  printf("total: %f\n", elapsed_seconds.count());
 }
 
 int sim_search_part_patterns(
