@@ -20,7 +20,7 @@ void sim_search_semi_patterns_omp_impl(
   bool include_eye = true,
   const std::string &trim_part = ""
 ) {
-          atuo start = std::chrono::high_resolution_clock::now();
+          auto start = std::chrono::high_resolution_clock::now();
   str_int_set pat_str;
   str2ints pat2str;
   int trim_size = trim_part.size();
