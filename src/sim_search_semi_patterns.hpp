@@ -27,7 +27,7 @@ void sim_search_semi_patterns_omp_impl(
   map_patterns_omp<trim_direction>(strings, cutoff, 'S', str2idx, strings_subset, pat_str, trim_part, metric);
           auto end = std::chrono::high_resolution_clock::now();
           std::chrono::duration<double> elapsed_seconds = end - start;
-          printf("patterns mapping=%d: %f\n", thread_id, elapsed_seconds.count());
+          printf("patterns mapping: %f\n", elapsed_seconds.count());
   distance_k_ptr distance_k = get_distance_k(metric);
 
   start = std::chrono::high_resolution_clock::now();
@@ -66,7 +66,7 @@ void sim_search_semi_patterns_omp_impl(
       out.insert({i, i});
             end = std::chrono::high_resolution_clock::now();
             elapsed_seconds = end - start;
-            printf("patterns iteration=%d: %f\n", thread_id, elapsed_seconds.count());
+            printf("patterns iteration=: %f\n", elapsed_seconds.count());
 }
 
 template <TrimDirection trim_direction>
