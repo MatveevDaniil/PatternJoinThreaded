@@ -85,11 +85,12 @@ void map_patterns_omp(
     thread_storage.push_back(std::vector<int>());
     auto& united_vector = thread_storage.back();
     std::string pattern = patterns_vector[i];
-    for (auto& pat2str_local: pat2str_collection) {
+    // for (auto& pat2str_local: pat2str_collection) {
+    for (int i = 0; i < 4; i++) {
       // if (pat2str_local.find(pattern) == pat2str_local.end()) 
       //   continue;
       // auto& local_vector = pat2str_local[pattern];
-      united_vector.push_back(local_vector[0]);
+      united_vector.push_back(0);
       // united_vector.insert(united_vector.end(), local_vector.begin(), local_vector.end());
     }
   }
