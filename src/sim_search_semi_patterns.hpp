@@ -91,7 +91,7 @@ void sim_search_semi_patterns_ompReduce_impl(
   for (auto& entry : pat2str)
     pat2str_values.push_back(entry.second);
   if (trim_direction == TrimDirection::No || trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
-    #pragma omp parallel for schedule(dynamic, 10)
+    #pragma omp parallel for schedule(runtime)
     for (auto entry : pat2str_values) {
       if (entry.size() > 1)
         for (auto str_idx1 = entry.begin(); str_idx1 != entry.end(); ++str_idx1) {
