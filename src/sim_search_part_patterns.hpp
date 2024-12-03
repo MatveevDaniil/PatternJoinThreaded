@@ -35,10 +35,10 @@ inline void check_part(
   for (auto& entry : part2strings)
     if (entry.second.size() < LARGE_SIM_SEARCH_THRESHOLD)
       entries_small.push_back(&entry);
-    else if (entry.second.size() < OMP_SIM_SEARCH_THRESHOLD)
-      entries_medium.push_back(&entry);
-    else
-      entries_large.push_back(&entry);
+    // else if (entry.second.size() < OMP_SIM_SEARCH_THRESHOLD)
+    //   entries_medium.push_back(&entry);
+    // else
+    //   entries_large.push_back(&entry);
   
   // PROCESS SMALL ENTRIES USING EXTENAL THREADING 
   #pragma omp parallel 
