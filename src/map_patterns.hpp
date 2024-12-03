@@ -4,6 +4,7 @@
 #include <omp.h>
 #include <vector>
 #include <string>
+#include <iostream>
 #include <mutex>
 #include "patterns_generators.hpp"
 #include "hash_containers.hpp"
