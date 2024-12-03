@@ -17,7 +17,7 @@ void map_patterns_omp(
   char pattern_type,
   str2int& str2idx,
   const ints* strings_subset,
-  str2ints& pat2str,
+  str2ints_parallel& pat2str,
   const std::string& trim_part = "",
   const char metric_type = 'L'
 ) {
