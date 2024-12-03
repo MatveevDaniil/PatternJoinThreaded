@@ -14,6 +14,10 @@
 #include <iostream>
 #include <chrono>
 
+int SIM_SEARCH_THRESHOLD = 50;
+int LARGE_SIM_SEARCH_THRESHOLD = 1000;
+int OMP_SIM_SEARCH_THRESHOLD = 40000;
+
 template <TrimDirection trim_direction>
 inline void check_part(
   std::vector<std::string> &strings,
@@ -26,25 +30,28 @@ inline void check_part(
   distance_k_ptr distance_k = get_distance_k(metric);
   
   std::vector<std::pair<std::string, ints>*> entries_small;
+  std::vector<std::pair<std::string, ints>*> entries_medium;
   std::vector<std::pair<std::string, ints>*> entries_large;
   for (auto& entry : part2strings)
-    if (entry.second.size() < 10000)
+    if (entry.second.size() < LARGE_SIM_SEARCH_THRESHOLD)
       entries_small.push_back(&entry);
+    else if (entry.second.size() < OMP_SIM_SEARCH_THRESHOLD)
+      entries_medium.push_back(&entry);
     else
       entries_large.push_back(&entry);
   
-  // PROCESS SMALL ENTRIES USING GUIDED SCHEDULING
+  // PROCESS SMALL ENTRIES USING EXTENAL THREADING 
   #pragma omp parallel 
   {
   double wtime = omp_get_wtime();
   int thread_id = omp_get_thread_num();
-  #pragma omp for schedule(runtime)
+  #pragma omp for schedule(dynamic,100) nowait
   for (size_t i = 0; i < entries_small.size(); ++i) {
     const auto* entry = entries_small[i];
     int part_len = entry->first.size();
     if (entry->second.size() == 1)
       out.insert({entry->second[0], entry->second[0]});
-    else if (entry->second.size() < 50) {
+    else if (entry->second.size() < sim_search_threshold) {
       const ints *string_indeces = &(entry->second);
       std::vector<std::string> trimmed_strings(string_indeces->size());
       if (trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
@@ -104,6 +111,22 @@ inline void check_part(
   }
   wtime = omp_get_wtime() - wtime;
   printf("thread_small=%d: %f\n", thread_id, wtime);
+  }
+
+  // PROCESS MEDIUM ENTRIES USING EXTENAL THREADING
+  #pragma omp parallel 
+  {
+  double wtime = omp_get_wtime();
+  int thread_id = omp_get_thread_num();
+  #pragma omp for schedule(dynamic,1) nowait
+  for (size_t i = 0; i < entries_medium.size(); ++i) {
+    const auto* entry = entries_medium[i];
+    int part_len = entry->first.size();
+    sim_search_semi_patterns_impl<trim_direction>(
+      strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
+  }
+  wtime = omp_get_wtime() - wtime;
+  printf("thread_medium=%d: %f\n", thread_id, wtime);
   }
 
   auto start = std::chrono::high_resolution_clock::now();
