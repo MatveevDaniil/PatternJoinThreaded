@@ -17,41 +17,34 @@ void map_patterns_omp(
   char pattern_type,
   str2int& str2idx,
   const ints* strings_subset,
-  str_int_queue& pat_str,
+  str2ints_parallel& pat2str,
   const std::string& trim_part = "",
   const char metric_type = 'L'
 ) {
   PatternFuncType PatternFunc = getPatternFunc(cutoff, pattern_type);
   int trim_size = trim_part.size();
 
-  #pragma omp parallel
-  {
   if (strings_subset == nullptr) {
-    #pragma omp for
     for (std::string str: strings)
       for (const auto& pattern: PatternFunc(str, nullptr))
-        pat_str.enqueue({pattern, str2idx[str]});
+        pat2str[pattern].push_back(str2idx[str]);
   }
   else {
     if (trim_direction == TrimDirection::No) {
-      #pragma omp for
       for (int str_idx: *strings_subset)
         for (const auto& pattern: PatternFunc(strings[str_idx], nullptr)) 
-          pat_str.enqueue({pattern, str_idx});
+          pat2str[pattern].push_back(str_idx);
     }
     else if (trim_direction == TrimDirection::Mid) {
       MidTrimFunc midTrim = getMidTrimFunc(metric_type);
-      #pragma omp for
       for (int str_idx: *strings_subset)
         for (const auto& pattern: PatternFunc(midTrim(strings[str_idx], trim_part), nullptr)) 
-          pat_str.enqueue({pattern, str_idx});
+          pat2str[pattern].push_back(str_idx);
     } else {
-      #pragma omp for
       for (int str_idx: *strings_subset)
         for (const auto& pattern: PatternFunc(trimString<trim_direction>(strings[str_idx], trim_size), nullptr)) 
-          pat_str.enqueue({pattern, str_idx});
+          pat2str[pattern].push_back(str_idx);
     }
-  }
   }
 }
 
