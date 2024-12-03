@@ -84,15 +84,15 @@ void sim_search_semi_patterns_ompReduce_impl(
 ) {
   str2ints_parallel pat2str;
   int trim_size = trim_part.size();
-  map_patterns_omp<trim_direction>(strings, cutoff, 'S', str2idx, strings_subset, pat2str, trim_part, metric);
+  ints_vector_vector pat2str_collection;
+  map_patterns_omp<trim_direction>(strings, cutoff, 'S', str2idx, strings_subset, pat2str_collection, trim_part, metric);
   distance_k_ptr distance_k = get_distance_k(metric);
-  std::vector<ints> pat2str_values;
-  pat2str_values.reserve(pat2str.size());
-  for (auto& entry : pat2str)
-    pat2str_values.push_back(entry.second);
+  #pragma omp parallel 
+  {
+  int tid = omp_get_thread_num();
+  auto& thread_storage = pat2str_collection[tid];
   if (trim_direction == TrimDirection::No || trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
-    #pragma omp parallel for schedule(runtime)
-    for (auto entry : pat2str_values) {
+    for (auto entry : thread_storage) {
       if (entry.size() > 1)
         for (auto str_idx1 = entry.begin(); str_idx1 != entry.end(); ++str_idx1) {
           std::string str1 = strings[*str_idx1];
@@ -106,8 +106,7 @@ void sim_search_semi_patterns_ompReduce_impl(
         }
     }
   } else {
-    #pragma omp parallel for schedule(dynamic, 10)
-    for (auto entry : pat2str_values) {
+    for (auto entry : thread_storage) {
       if (entry.size() > 1)
         for (auto str_idx1 = entry.begin(); str_idx1 != entry.end(); ++str_idx1) {
           std::string str1 = trimString<trim_direction>(strings[*str_idx1], trim_size);
@@ -123,10 +122,10 @@ void sim_search_semi_patterns_ompReduce_impl(
         }
     }
   }
+  }
 
   auto start = std::chrono::high_resolution_clock::now();
-  pat2str.clear();
-  pat2str_values.clear();
+  pat2str_collection.clear();
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
   printf("clearing pat2str: %f\n", elapsed_seconds.count());

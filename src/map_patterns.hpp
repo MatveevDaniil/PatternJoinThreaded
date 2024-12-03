@@ -27,9 +27,8 @@ void map_patterns_omp(
   str2ints_collection pat2str_collection;
   strs_parallel patterns;
   int thread_num = omp_get_max_threads();
-  for (int i = 0; i < thread_num; i++) {
-    pat2str_collection.push_back(str2ints());
-  }
+  pat2str_collection.resize(thread_num);
+  pat2str_values.resize(thread_num);
   std::cout << "mapping stage started" << std::endl;
   #pragma omp parallel 
   {
@@ -80,8 +79,8 @@ void map_patterns_omp(
   #pragma omp parallel 
   {
   int tid = omp_get_thread_num();
-  auto& thread_storage = pat2str_collection[tid];
-  #pragma omp for schedule(dynamic, 10)
+  auto& thread_storage = pat2str_values[tid];
+  #pragma omp for schedule(dynamic, 1)
   for (size_t i = 0; i < patterns_vector.size(); i++) {
     thread_storage.push_back(std::vector<int>());
     auto& united_vector = thread_storage.back();
@@ -89,7 +88,8 @@ void map_patterns_omp(
     for (auto& pat2str_local: pat2str_collection) {
       if (pat2str_local.find(pattern) == pat2str_local.end()) 
         continue;
-      
+      auto& local_vector = pat2str_local[pattern];
+      united_vector.insert(united_vector.end(), local_vector.begin(), local_vector.end());
     }
   }
   }
