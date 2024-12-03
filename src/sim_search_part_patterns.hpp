@@ -121,7 +121,6 @@ inline void check_part(
   #pragma omp for schedule(dynamic,1) nowait
   for (size_t i = 0; i < entries_medium.size(); ++i) {
     const auto* entry = entries_medium[i];
-    int part_len = entry->first.size();
     sim_search_semi_patterns_impl<trim_direction>(
       strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
   }
