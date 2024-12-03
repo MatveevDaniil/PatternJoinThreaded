@@ -38,7 +38,7 @@ inline void check_part(
   {
   double wtime = omp_get_wtime();
   int thread_id = omp_get_thread_num();
-  #pragma omp for schedule(dynamic, 10)
+  #pragma omp for schedule(runtime)
   for (size_t i = 0; i < entries_small.size(); ++i) {
     const auto* entry = entries_small[i];
     int part_len = entry->first.size();
