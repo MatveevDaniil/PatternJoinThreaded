@@ -82,7 +82,7 @@ void sim_search_semi_patterns_ompReduce_impl(
   bool include_eye = true,
   const std::string &trim_part = ""
 ) {
-  str2ints_parallel pat2str;
+  str2ints pat2str;
   int trim_size = trim_part.size();
   map_patterns_omp<trim_direction>(strings, cutoff, 'S', str2idx, strings_subset, pat2str, trim_part, metric);
   distance_k_ptr distance_k = get_distance_k(metric);
