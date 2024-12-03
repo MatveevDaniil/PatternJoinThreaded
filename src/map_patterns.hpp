@@ -94,6 +94,12 @@ void map_patterns_omp(
     }
   }
   }
+  #pragma omp parallel 
+  {
+  int tid = omp_get_thread_num();
+  auto& pat2str_local = pat2str_values[tid];
+  pat2str_local.clear();
+  }
 }
 
 template <TrimDirection trim_direction>
