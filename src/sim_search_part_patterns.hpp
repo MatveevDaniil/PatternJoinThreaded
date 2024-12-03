@@ -29,9 +29,9 @@ inline void check_part(
 ) {
   distance_k_ptr distance_k = get_distance_k(metric);
   
-  std::vector<std::pair<std::string, ints>*> entries_small;
-  std::vector<std::pair<std::string, ints>*> entries_medium;
-  std::vector<std::pair<std::string, ints>*> entries_large;
+  std::vector<std::pair<const std::string, ints>*> entries_small;
+  std::vector<std::pair<const std::string, ints>*> entries_medium;
+  std::vector<std::pair<const std::string, ints>*> entries_large;
   for (auto& entry : part2strings)
     if (entry.second.size() < LARGE_SIM_SEARCH_THRESHOLD)
       entries_small.push_back(&entry);
