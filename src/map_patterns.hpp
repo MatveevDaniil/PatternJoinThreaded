@@ -24,7 +24,7 @@ void map_patterns_omp(
   PatternFuncType PatternFunc = getPatternFunc(cutoff, pattern_type);
   int trim_size = trim_part.size();
   str2ints_collection pat2str_collection;
-  strs patterns;
+  strs_parallel patterns;
   int thread_num = omp_get_max_threads();
   for (int i = 0; i < thread_num; i++) {
     pat2str_collection.push_back(str2ints());
