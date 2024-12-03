@@ -89,7 +89,7 @@ void map_patterns_omp(
       if (pat2str_local.find(pattern) == pat2str_local.end()) 
         continue;
       auto& local_vector = pat2str_local[pattern];
-      united_vector.insert(united_vector.end(), local_vector.begin(), local_vector.end());
+      // united_vector.insert(united_vector.end(), local_vector.begin(), local_vector.end());
     }
   }
   }
