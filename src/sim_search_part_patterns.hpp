@@ -118,11 +118,11 @@ inline void check_part(
       strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
           auto end = std::chrono::high_resolution_clock::now();
           std::chrono::duration<double> elapsed_seconds = end - start;
-          printf("large total=%ld %ld: %f\n", i, entry->second.size(), elapsed_seconds.count());
+          printf("large entry size=%ld: %f\n", entry->second.size(), elapsed_seconds.count());
   }
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
-  printf("total: %f\n", elapsed_seconds.count());
+  printf("large total: %f\n", elapsed_seconds.count());
 }
 
 int sim_search_part_patterns(
