@@ -124,6 +124,12 @@ void sim_search_semi_patterns_ompReduce_impl(
     }
   }
 
+  auto start = std::chrono::high_resolution_clock::now();
+  pat2str.clear();
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
+  printf("clearing pat2str: %f\n", elapsed_seconds.count());
+
   if (include_eye)
     for (size_t i = 0; i < strings.size(); i++)
       out.insert({i, i});
