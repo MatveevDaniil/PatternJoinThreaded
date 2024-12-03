@@ -14,9 +14,9 @@
 #include <iostream>
 #include <chrono>
 
-extern size_t SIM_SEARCH_THRESHOLD = 50;
-extern size_t LARGE_SIM_SEARCH_THRESHOLD = 1000;
-extern size_t OMP_SIM_SEARCH_THRESHOLD = 40000;
+extern size_t SIM_SEARCH_THRESHOLD;
+extern size_t LARGE_SIM_SEARCH_THRESHOLD;
+extern size_t OMP_SIM_SEARCH_THRESHOLD;
 
 template <TrimDirection trim_direction>
 inline void check_part(
