@@ -27,7 +27,8 @@ void map_patterns_omp(
   str2ints_collection pat2str_collection;
   strs_parallel patterns;
   int thread_num = omp_get_max_threads();
-  pat2str_collection.resize(thread_num);
+  for (int i = 0; i < thread_num; i++)
+    pat2str_collection.push_back(str2ints());
   pat2str_values.resize(thread_num);
   std::cout << "mapping stage started" << std::endl;
   #pragma omp parallel 
