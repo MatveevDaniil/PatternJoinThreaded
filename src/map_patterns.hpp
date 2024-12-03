@@ -74,9 +74,9 @@ void map_patterns_omp(
     }
   }
   }
-  std::cout << "reduce stage started" << std::endl;
   std::vector<std::string> patterns_vector(patterns.begin(), patterns.end());
-
+  
+  std::cout << "reduce stage started" << std::endl;
   #pragma omp parallel for
   for (size_t i = 0; i < patterns_vector.size(); i++) {
     std::string pattern = patterns_vector[i];
