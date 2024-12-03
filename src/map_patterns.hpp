@@ -82,6 +82,8 @@ void map_patterns_omp(
     std::string pattern = patterns_vector[i];
     auto& vec = pat2str[pattern];
     for (auto& pat2str_local: pat2str_collection) {
+      if (pat2str_local.find(pattern) == pat2str_local.end()) 
+        continue;
       for (int str_idx: pat2str_local[pattern]) {
         vec.push_back(str_idx);
       }
