@@ -80,9 +80,10 @@ void map_patterns_omp(
   #pragma omp parallel for
   for (size_t i = 0; i < patterns_vector.size(); i++) {
     std::string pattern = patterns_vector[i];
+    auto& vec = pat2str[pattern]
     for (auto pat2str_local: pat2str_collection) {
       for (int str_idx: pat2str_local[pattern]) {
-        pat2str[pattern].push_back(str_idx);
+        vec.push_back(str_idx);
       }
     }
   }
