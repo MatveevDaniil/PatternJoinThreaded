@@ -18,7 +18,7 @@ void map_patterns_omp(
   char pattern_type,
   str2int& str2idx,
   const ints* strings_subset,
-  str2ints_parallel& pat2str,
+  ints_vector_vector& pat2str_values,
   const std::string& trim_part = "",
   const char metric_type = 'L'
 ) {
@@ -77,17 +77,21 @@ void map_patterns_omp(
   std::vector<std::string> patterns_vector(patterns.begin(), patterns.end());
 
   std::cout << "reduce stage started" << std::endl;
-  #pragma omp parallel for
+  #pragma omp parallel 
+  {
+  int tid = omp_get_thread_num();
+  auto& thread_storage = pat2str_collection[tid];
+  #pragma omp for schedule(dynamic, 10)
   for (size_t i = 0; i < patterns_vector.size(); i++) {
+    thread_storage.push_back(std::vector<int>());
+    auto& united_vector = thread_storage.back();
     std::string pattern = patterns_vector[i];
-    auto& vec = pat2str[pattern];
     for (auto& pat2str_local: pat2str_collection) {
       if (pat2str_local.find(pattern) == pat2str_local.end()) 
         continue;
-      for (int str_idx: pat2str_local[pattern]) {
-        vec.push_back(str_idx);
-      }
+      
     }
+  }
   }
 }
 
