@@ -51,7 +51,7 @@ inline void check_part(
     int part_len = entry->first.size();
     if (entry->second.size() == 1)
       out.insert({entry->second[0], entry->second[0]});
-    else if (entry->second.size() < sim_search_threshold) {
+    else if (entry->second.size() < SIM_SEARCH_THRESHOLD) {
       const ints *string_indeces = &(entry->second);
       std::vector<std::string> trimmed_strings(string_indeces->size());
       if (trim_direction == TrimDirection::Mid || (trim_direction == TrimDirection::End && metric == 'H')) {
