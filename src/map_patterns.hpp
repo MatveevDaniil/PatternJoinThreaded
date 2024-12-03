@@ -30,9 +30,8 @@ void map_patterns_omp(
     #pragma omp for
     for (std::string str: strings) {
       for (const auto& pattern: PatternFunc(str, nullptr)) {
-        auto& vec = pat2str[pattern];
         #pragma omp critical
-        vec.push_back(str2idx[str]);
+        pat2str[pattern];.push_back(str2idx[str]);
       }
     }
   }
@@ -41,9 +40,8 @@ void map_patterns_omp(
       #pragma omp for
       for (int str_idx: *strings_subset) {
         for (const auto& pattern: PatternFunc(strings[str_idx], nullptr)) {
-          auto& vec = pat2str[pattern];
           #pragma omp critical
-          vec.push_back(str_idx);
+          pat2str[pattern];.push_back(str2idx[str]);
         }
       }
     }
@@ -52,18 +50,16 @@ void map_patterns_omp(
       #pragma omp for
       for (int str_idx: *strings_subset) {
         for (const auto& pattern: PatternFunc(midTrim(strings[str_idx], trim_part), nullptr)) {
-          auto& vec = pat2str[pattern];
           #pragma omp critical
-          vec.push_back(str_idx);
+          pat2str[pattern];.push_back(str2idx[str]);
         }
       }
     } else {
       #pragma omp for
       for (int str_idx: *strings_subset) {
         for (const auto& pattern: PatternFunc(trimString<trim_direction>(strings[str_idx], trim_size), nullptr)) {
-          auto& vec = pat2str[pattern];
           #pragma omp critical
-          vec.push_back(str_idx);
+          pat2str[pattern];.push_back(str2idx[str]);
         } 
       }
     }
