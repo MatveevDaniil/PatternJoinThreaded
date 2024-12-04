@@ -30,7 +30,6 @@ void map_patterns_omp(
   for (int i = 0; i < thread_num; i++)
     pat2str_collection.push_back(str2ints());
   pat2str_values.resize(thread_num);
-  std::cout << "mapping stage started" << std::endl;
   #pragma omp parallel 
   {
   int tid = omp_get_thread_num();
@@ -76,7 +75,6 @@ void map_patterns_omp(
   }
   std::vector<std::string> patterns_vector(patterns.begin(), patterns.end());
 
-  std::cout << "reduce stage started" << std::endl;
   #pragma omp parallel 
   {
   int tid = omp_get_thread_num();
