@@ -124,11 +124,12 @@ void sim_search_semi_patterns_ompReduce_impl(
   }
   }
 
-  auto start = std::chrono::high_resolution_clock::now();
-  pat2str_collection.clear();
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed_seconds = end - start;
-  printf("clearing pat2str: %f\n", elapsed_seconds.count());
+  #pragma omp parallel
+  {
+  int tid = omp_get_thread_num();
+  auto& pat2str_local = pat2str_collection[tid];
+  pat2str_local.clear();
+  }
 
   if (include_eye)
     for (size_t i = 0; i < strings.size(); i++)
