@@ -9,7 +9,7 @@
 #include "sim_search_part_patterns.hpp"
 
 size_t SIM_SEARCH_THRESHOLD = 50;
-size_t OMP_SIM_SEARCH_THRESHOLD = 40000;
+size_t OMP_SIM_SEARCH_THRESHOLD = 20'000;
 
 struct Options {
   std::string file_name;
