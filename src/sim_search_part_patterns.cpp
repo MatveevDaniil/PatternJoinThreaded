@@ -10,7 +10,7 @@ void sim_search_2parts(
   bool include_eye = true,
   int cutoff = 1
 ) {
-  str2ints start2idxs, end2idxs;
+  str2ints_parallel start2idxs, end2idxs;
   start2idxs.reserve(strings.size());
   end2idxs.reserve(strings.size());
   if (metric == 'L')
@@ -55,7 +55,7 @@ void sim_search_3parts(
   bool include_eye = true,
   int cutoff = 1
 ) {
-  str2ints start2idxs, mid2idxs, end2idxs;
+  str2ints_parallel start2idxs, mid2idxs, end2idxs;
   start2idxs.reserve(strings.size());
   mid2idxs.reserve(strings.size());
   end2idxs.reserve(strings.size());
@@ -113,11 +113,10 @@ void sim_search_3parts(
 
   auto start = std::chrono::high_resolution_clock::now();
   check_part<TrimDirection::Start>(strings, cutoff, metric, str2idx, start2idxs, out);
-  start2idxs.clear();
   check_part<TrimDirection::Mid>(strings, cutoff, metric, str2idx, mid2idxs, out);
-  mid2idxs.clear();
   check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
   if (include_eye)
+    #pragma omp parallel for
     for (size_t i = 0; i < strings.size(); i++)
       out.insert({i, i});
   auto end = std::chrono::high_resolution_clock::now();

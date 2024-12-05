@@ -23,13 +23,13 @@ inline void check_part(
   int cutoff,
   char metric,
   str2int& str2idx,
-  str2ints& part2strings,
+  str2ints_parallel& part2strings,
   int_pair_set& out
 ) {
   distance_k_ptr distance_k = get_distance_k(metric);
   
-  std::vector<std::pair<std::string, ints>*> entries_small;
-  std::vector<std::pair<std::string, ints>*> entries_large;
+  std::vector<std::pair<const std::string, ints>*> entries_small;
+  std::vector<std::pair<const std::string, ints>*> entries_large;
   for (auto& entry : part2strings)
     if (entry.second.size() < OMP_SIM_SEARCH_THRESHOLD)
       entries_small.push_back(&entry);
