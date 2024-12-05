@@ -14,6 +14,7 @@ void sim_search_2parts(
   start2idxs.reserve(strings.size());
   end2idxs.reserve(strings.size());
   if (metric == 'L')
+    #pragma omp parallel for
     for (size_t i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
       size_t half_len = str.size() / 2;
@@ -25,6 +26,7 @@ void sim_search_2parts(
       }
     }
   else
+    #pragma omp parallel for
     for (size_t i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
       size_t half_len = str.size() / 2;
@@ -60,6 +62,7 @@ void sim_search_3parts(
   mid2idxs.reserve(strings.size());
   end2idxs.reserve(strings.size());
   if (metric == 'L')
+    #pragma omp parallel for
     for (size_t i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
       size_t part_len = str.size() / 3;
@@ -88,6 +91,7 @@ void sim_search_3parts(
       }
     }
   else
+    #pragma omp parallel for
     for (size_t i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
       size_t part_len = str.size() / 3;
