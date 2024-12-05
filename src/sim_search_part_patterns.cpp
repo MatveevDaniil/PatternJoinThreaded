@@ -10,11 +10,10 @@ void sim_search_2parts(
   bool include_eye = true,
   int cutoff = 1
 ) {
-  str2ints_parallel start2idxs, end2idxs;
+  str2ints start2idxs, end2idxs;
   start2idxs.reserve(strings.size());
   end2idxs.reserve(strings.size());
   if (metric == 'L')
-    #pragma omp parallel for
     for (size_t i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
       size_t half_len = str.size() / 2;
@@ -26,7 +25,6 @@ void sim_search_2parts(
       }
     }
   else
-    #pragma omp parallel for
     for (size_t i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
       size_t half_len = str.size() / 2;
@@ -57,12 +55,12 @@ void sim_search_3parts(
   bool include_eye = true,
   int cutoff = 1
 ) {
-  str2ints_parallel start2idxs, mid2idxs, end2idxs;
+  str2ints start2idxs, mid2idxs, end2idxs;
   start2idxs.reserve(strings.size());
   mid2idxs.reserve(strings.size());
   end2idxs.reserve(strings.size());
+  auto start = std::chrono::high_resolution_clock::now();
   if (metric == 'L')
-    #pragma omp parallel for
     for (size_t i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
       size_t part_len = str.size() / 3;
@@ -91,7 +89,6 @@ void sim_search_3parts(
       }
     }
   else
-    #pragma omp parallel for
     for (size_t i = 0; i < strings.size(); i++) {
       std::string str = strings[i];
       size_t part_len = str.size() / 3;
@@ -114,8 +111,11 @@ void sim_search_3parts(
         end2idxs[str.substr(part_len * 2 + 2)].push_back(i);
       }
     }
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed = end - start;
+  std::cout << "parts distribution: " << elapsed.count() << " s\n";
 
-  auto start = std::chrono::high_resolution_clock::now();
+  start = std::chrono::high_resolution_clock::now();
   check_part<TrimDirection::Start>(strings, cutoff, metric, str2idx, start2idxs, out);
   check_part<TrimDirection::Mid>(strings, cutoff, metric, str2idx, mid2idxs, out);
   check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
@@ -123,8 +123,8 @@ void sim_search_3parts(
     #pragma omp parallel for
     for (size_t i = 0; i < strings.size(); i++)
       out.insert({i, i});
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double> elapsed = end - start;
+  end = std::chrono::high_resolution_clock::now();
+  elapsed = end - start;
   std::cout << "check_part total: " << elapsed.count() << " s\n";
 }
 
