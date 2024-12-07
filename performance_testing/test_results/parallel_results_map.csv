@@ -1,0 +1,10 @@
+N,set_impl,operation,P,time
+392574,ankerl_mapreduce,insert,8,17.4704
+392574,ankerl_mapreduce,iteration,8,20.3534
+392574,ankerl_mapreduce,map_clear,8,8.87577
+392574,gtl,insert,8,20.3964
+392574,gtl,iteration,8,23.5539
+392574,gtl,map_clear,8,26.3304
+392574,ankerl_mapreduce,insert,16,15.2362
+392574,ankerl_mapreduce,iteration,16,25.6477
+392574,ankerl_mapreduce,map_clear,16,13.5258
