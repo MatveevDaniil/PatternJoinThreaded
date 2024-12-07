@@ -263,7 +263,7 @@ int mapreduce_semipattern_search(
 int main() {
   std::vector<std::string> TEST_FILES = {"../test_data/P00245-aa"};
   std::vector<size_t> true_outputs = {14802311};
-  std::vector<int> threads = {8, 16};
+  std::vector<int> threads = {1, 4, 8, 16};
 
   //////////////////
   // Serial Tests //
