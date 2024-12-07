@@ -183,7 +183,7 @@ int mapreduce_semipattern_search(
         }
       }
       wtime = omp_get_wtime() - wtime;
-      printf("thread_small=%d: %f\n", thread_id, wtime);
+      printf("thread_small=%d: %f\n", tid, wtime);
     }
     patterns_vector = std::vector<std::string>(patterns.begin(), patterns.end());
   });
