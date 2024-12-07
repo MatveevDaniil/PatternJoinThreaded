@@ -195,7 +195,7 @@ int mapreduce_semipattern_search(
             if (map2.find(pattern) != map2.end()) { found = true; break; }
           }
           if (!found)
-            map0[pattern];
+            map0[pattern] = idx_vector();
         }
       }
     }
