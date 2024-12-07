@@ -173,7 +173,8 @@ int mapreduce_semipattern_search(
     {
       int tid = omp_get_thread_num();
       auto& map = maps[tid];
-      #pragma omp for
+      double wtime = omp_get_wtime();
+      #pragma omp for nowait
       for (size_t i = 0; i < input.size(); ++i) {
         const std::string& str = input[i];
         for (const auto& pattern : semi2Patterns(str)) {
@@ -181,6 +182,8 @@ int mapreduce_semipattern_search(
           map[pattern].push_back(i);
         }
       }
+      wtime = omp_get_wtime() - wtime;
+      printf("thread_small=%d: %f\n", thread_id, wtime);
     }
     patterns_vector = std::vector<std::string>(patterns.begin(), patterns.end());
   });
