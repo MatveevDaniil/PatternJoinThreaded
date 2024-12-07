@@ -5,11 +5,13 @@
 #include "../thirdparty/gtl/phmap.hpp"
 #include "../thirdparty/concurrentqueue.h"
 #include "../src/bounded_edit_distance.hpp"
+#include "../thirdparty/small_vector.hpp"
 #include "timing_impl.hpp"
 #include <tbb/concurrent_vector.h>
 
-using std_map = std::unordered_map<std::string, std::vector<size_t>>;
-using ankerl_map = ankerl::unordered_dense::map<std::string, std::vector<size_t>>;
+using idx_vector = gch::small_vector<size_t>;
+using std_map = std::unordered_map<std::string, idx_vector>;
+using ankerl_map = ankerl::unordered_dense::map<std::string, idx_vector>;
 using tbb_vector = tbb::concurrent_vector<size_t>;
 using ints_vector_vector = std::vector<std::vector<std::vector<size_t>>>;
 using gtl_p_map = gtl::parallel_flat_hash_map_m<std::string, tbb_vector>;
@@ -66,10 +68,8 @@ int serial_semipattern_search(
   measure_time(ofs, N + "," + map_name + ",insert", [&]() {
     for (size_t i = 0; i < input.size(); ++i) {
       const std::string& str = input[i];
-      for (const auto& pattern : semi2Patterns(str)) {
-        patterns.insert(pattern);
+      for (const auto& pattern : semi2Patterns(str))
         map[pattern].push_back(i);
-      }
     }
   });
 
