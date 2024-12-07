@@ -235,6 +235,7 @@ int mapreduce_semipattern_search(
     {
       int tid = omp_get_thread_num();
       auto& thread_idxs = threads_idxs[tid];
+      std::cout << thread_idxs.size() << std::endl;
       double wtime = omp_get_wtime();
       for (auto& idxs : thread_idxs) {
         for (size_t i = 0; i < idxs.size(); ++i)
