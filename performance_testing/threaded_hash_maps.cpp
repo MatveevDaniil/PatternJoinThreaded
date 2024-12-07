@@ -268,6 +268,7 @@ int main() {
   std::vector<size_t> true_outputs = {14802311};
   std::vector<int> threads = {1, 4, 8, 16};
 
+
   //////////////////
   // Serial Tests //
   //////////////////
@@ -277,9 +278,9 @@ int main() {
     std::vector<std::string> strings;
     readFile(TEST_FILES[i], strings);
 
-    serial_semipattern_search<ankerl_map>(strings, "ankerl", ofs, true_outputs[i]);
-    serial_semipattern_search<std_map>(strings, "std", ofs, true_outputs[i]);
-    serial_semipattern_search<gtl_p_map>(strings, "gtl", ofs, true_outputs[i]);
+    // serial_semipattern_search<ankerl_map>(strings, "ankerl", ofs, true_outputs[i]);
+    // serial_semipattern_search<std_map>(strings, "std", ofs, true_outputs[i]);
+    // serial_semipattern_search<gtl_p_map>(strings, "gtl", ofs, true_outputs[i]);
   }
   ofs.close();
 
@@ -295,8 +296,8 @@ int main() {
     for (int P : threads) {
       mapreduce_semipattern_search<ankerl_map>(
         strings, "ankerl_mapreduce", ofs, P, true_outputs[i]);
-      phmap_semipattern_search<gtl_p_map>(
-        strings, "gtl", ofs, P, true_outputs[i]);
+      // phmap_semipattern_search<gtl_p_map>(
+      //   strings, "gtl", ofs, P, true_outputs[i]);
     }
   }
   ofs.close();
