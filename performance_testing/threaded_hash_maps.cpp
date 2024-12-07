@@ -168,11 +168,10 @@ int mapreduce_semipattern_search(
   std::string N = std::to_string(input.size());
   std::string P_str = std::to_string(P);
   gtl_p_set_str patterns;
-  std::vector<std::string> patterns_vector;
+  tbb::concurrent_vector<std::string> patterns_vector;
   ints_vector_vector threads_idxs(P);
 
   measure_time(ofs, N + "," + map_name + ",insert," + P_str, [&]() {
-    tbb::concurrent_vector<std::string> patterns_vector;
     #pragma omp parallel num_threads(P) 
     {
       int tid = omp_get_thread_num();
@@ -291,7 +290,7 @@ int main() {
   std::ofstream ofs("../test_results/serial_results_map.csv");
   ofs << "N,map_impl,operation,time" << std::endl;
   std::cout << "serial test" << std::endl;
-  std::cout << "N,set_impl,operation,time" << std::endl;
+  std::cout << "N,map_impl,operation,time" << std::endl;
   for (size_t i = 0; i < TEST_FILES.size(); ++i) {
     std::vector<std::string> strings;
     readFile(TEST_FILES[i], strings);
@@ -308,7 +307,7 @@ int main() {
   std::ofstream ofs_p("../test_results/parallel_results_map.csv");
   ofs_p << "N,map_impl,operation,P,time" << std::endl;
   std::cout << "parallel test" << std::endl;
-  std::cout << "N,set_impl,operation,P,time" << std::endl;
+  std::cout << "N,map_impl,operation,P,time" << std::endl;
   for (size_t i = 0; i < TEST_FILES.size(); ++i) {
     std::vector<std::string> strings;
     readFile(TEST_FILES[i], strings);
