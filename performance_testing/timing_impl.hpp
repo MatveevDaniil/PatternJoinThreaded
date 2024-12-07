@@ -21,6 +21,7 @@ void measure_time(std::ofstream& ofs, const std::string& label, Func&& func, Arg
 
   double average_duration = total_duration / iterations;
   ofs << label << "," << average_duration << std::endl;
+  std::cout << label << "," << average_duration << std::endl;
   ofs.flush();
 };
 
