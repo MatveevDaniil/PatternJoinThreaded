@@ -280,6 +280,8 @@ int main() {
   //////////////////
   std::ofstream ofs("../test_results/serial_results_map.csv");
   ofs << "N,set_impl,operation,time" << std::endl;
+  std::cout << "serial test" << std::endl;
+  std::cout << "N,set_impl,operation,time" << std::endl;
   for (size_t i = 0; i < TEST_FILES.size(); ++i) {
     std::vector<std::string> strings;
     readFile(TEST_FILES[i], strings);
@@ -295,6 +297,8 @@ int main() {
   ////////////////////////
   std::ofstream ofs_p("../test_results/parallel_results_map.csv");
   ofs_p << "N,set_impl,operation,P,time" << std::endl;
+  std::cout << "parallel test" << std::endl;
+  std::cout << "N,set_impl,operation,P,time" << std::endl;
   for (size_t i = 0; i < TEST_FILES.size(); ++i) {
     std::vector<std::string> strings;
     readFile(TEST_FILES[i], strings);
