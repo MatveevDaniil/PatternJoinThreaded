@@ -187,12 +187,13 @@ int mapreduce_semipattern_search(
       printf("insert: thread=%d: %f\n", tid, wtime);
       
       for (auto& pattern: map) {
+        bool found = false;
         for (int tid2 = 0; tid2 < tid; tid2++) {
           auto& map2 = maps[tid2];
-          if (map2.find(pattern.first) != map2.end()) 
-            break;
+          if (map2.find(pattern.first) != map2.end()) { found = true; break; }
         }
-        patterns_vector.push_back(pattern.first);
+        if (!found)
+          patterns_vector.push_back(pattern.first);
       }
     }
   });
