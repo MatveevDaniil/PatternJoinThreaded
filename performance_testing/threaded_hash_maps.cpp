@@ -218,7 +218,7 @@ int mapreduce_semipattern_search(
         }
       }
       wtime = omp_get_wtime() - wtime;
-      printf("iterate: thread_small=%d: %f\n", tid, wtime);
+      printf("iterate: thread=%d: %f\n", tid, wtime);
     }
 
     // Now we parallely itearate over each collection_i
@@ -239,7 +239,7 @@ int mapreduce_semipattern_search(
               }
       }
       wtime = omp_get_wtime() - wtime;
-      printf("iterate: thread_small=%d: %f\n", tid, wtime);
+      printf("iterate: thread=%d: %f\n", tid, wtime);
     }
   });
   size_t output_size = output.size() + input.size();
