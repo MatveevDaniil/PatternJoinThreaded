@@ -272,7 +272,7 @@ int main() {
   //////////////////
   // Serial Tests //
   //////////////////
-  // std::ofstream ofs("../test_results/serial_results_map.csv");
+  std::ofstream ofs("../test_results/serial_results_map.csv");
   // ofs << "N,set_impl,operation,time" << std::endl;
   // for (size_t i = 0; i < TEST_FILES.size(); ++i) {
   //   std::vector<std::string> strings;
@@ -282,7 +282,7 @@ int main() {
   //   serial_semipattern_search<std_map>(strings, "std", ofs, true_outputs[i]);
   //   serial_semipattern_search<gtl_p_map>(strings, "gtl", ofs, true_outputs[i]);
   // }
-  // ofs.close();
+  ofs.close();
 
   ////////////////////////
   // Parallel Map Tests //
