@@ -167,8 +167,7 @@ int mapreduce_semipattern_search(
   gtl_p_set_idxpair output;
   std::string N = std::to_string(input.size());
   std::string P_str = std::to_string(P);
-  gtl_p_set_str patterns;
-  tbb::concurrent_vector<std::string> patterns_vector;
+  std::vector<std::string> patterns_vector;
   ints_vector_vector threads_idxs(P);
 
   measure_time(ofs, N + "," + map_name + ",insert," + P_str, [&]() {
@@ -186,17 +185,25 @@ int mapreduce_semipattern_search(
       wtime = omp_get_wtime() - wtime;
       printf("insert: thread=%d: %f\n", tid, wtime);
       
-      for (auto& pattern: map) {
-        bool found = false;
-        for (int tid2 = 0; tid2 < tid; tid2++) {
-          auto& map2 = maps[tid2];
-          if (map2.find(pattern.first) != map2.end()) { found = true; break; }
+      if (tid != 0) {
+        auto& map0 = maps[0];
+        for (auto& [pattern, _]: map) {
+          bool found = false;
+          for (int tid2 = 0; tid2 < tid; tid2++) {
+            auto& map2 = maps[tid2];
+            if (map2.find(pattern) != map2.end()) { found = true; break; }
+          }
+          if (!found)
+            map0[pattern];
         }
-        if (!found)
-          patterns_vector.push_back(pattern.first);
       }
     }
+    patterns_vector.reserve(maps[0].size());
+    for (auto& [pattern, idxs] : maps[0])
+      patterns_vector.push_back(pattern);
   });
+
+  std::cout << patterns_vector.size() << std::endl;
 
   measure_time(ofs, N + "," + map_name + ",iteration," + P_str, [&]() {
     // This stage combines values (vectors) from local maps
@@ -227,6 +234,7 @@ int mapreduce_semipattern_search(
           united_vector.insert(united_vector.end(), local_vector.begin(), local_vector.end());
         }
       }
+      thread_idxs.shrink_to_fit();
       wtime = omp_get_wtime() - wtime;
       printf("iterate 1: thread=%d: %f\n", tid, wtime);
     }
@@ -272,7 +280,6 @@ int mapreduce_semipattern_search(
     }
     maps.clear();
     threads_idxs.clear();
-    patterns.clear();
     patterns_vector.clear();
   });
 
