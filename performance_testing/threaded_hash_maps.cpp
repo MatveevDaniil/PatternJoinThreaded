@@ -183,7 +183,7 @@ int mapreduce_semipattern_search(
         }
       }
       wtime = omp_get_wtime() - wtime;
-      printf("thread_small=%d: %f\n", tid, wtime);
+      printf("insert: thread=%d: %f\n", tid, wtime);
     }
     patterns_vector = std::vector<std::string>(patterns.begin(), patterns.end());
   });
@@ -204,7 +204,8 @@ int mapreduce_semipattern_search(
       int tid = omp_get_thread_num();
       auto& thread_idxs = threads_idxs[tid];
       thread_idxs.reserve(patterns_vector.size() / P);
-      #pragma omp for schedule(dynamic, 1)
+      double wtime = omp_get_wtime();
+      #pragma omp for schedule(dynamic, 1) nowait
       for (size_t i = 0; i < patterns_vector.size(); i++) {
         thread_idxs.push_back(std::vector<size_t>());
         auto& united_vector = thread_idxs.back();
@@ -216,6 +217,8 @@ int mapreduce_semipattern_search(
           united_vector.insert(united_vector.end(), local_vector.begin(), local_vector.end());
         }
       }
+      wtime = omp_get_wtime() - wtime;
+      printf("iterate: thread_small=%d: %f\n", tid, wtime);
     }
 
     // Now we parallely itearate over each collection_i
@@ -223,6 +226,7 @@ int mapreduce_semipattern_search(
     {
       int tid = omp_get_thread_num();
       auto& thread_idxs = threads_idxs[tid];
+      double wtime = omp_get_wtime();
       for (auto& idxs : thread_idxs) {
         for (size_t i = 0; i < idxs.size(); ++i)
           for (size_t j = i + 1; j < idxs.size(); ++j)
@@ -234,6 +238,8 @@ int mapreduce_semipattern_search(
                   output.insert({idxs[j], idxs[i]});
               }
       }
+      wtime = omp_get_wtime() - wtime;
+      printf("iterate: thread_small=%d: %f\n", tid, wtime);
     }
   });
   size_t output_size = output.size() + input.size();
@@ -266,23 +272,23 @@ int mapreduce_semipattern_search(
 int main() {
   std::vector<std::string> TEST_FILES = {"../test_data/P00245-aa"};
   std::vector<size_t> true_outputs = {14802311};
-  std::vector<int> threads = {1, 4, 8, 16};
+  std::vector<int> threads = {1};
 
 
   //////////////////
   // Serial Tests //
   //////////////////
-  // std::ofstream ofs("../test_results/serial_results_map.csv");
-  // ofs << "N,set_impl,operation,time" << std::endl;
-  // for (size_t i = 0; i < TEST_FILES.size(); ++i) {
-  //   std::vector<std::string> strings;
-  //   readFile(TEST_FILES[i], strings);
+  std::ofstream ofs("../test_results/serial_results_map.csv");
+  ofs << "N,set_impl,operation,time" << std::endl;
+  for (size_t i = 0; i < TEST_FILES.size(); ++i) {
+    std::vector<std::string> strings;
+    readFile(TEST_FILES[i], strings);
 
-  //   serial_semipattern_search<ankerl_map>(strings, "ankerl", ofs, true_outputs[i]);
-  //   serial_semipattern_search<std_map>(strings, "std", ofs, true_outputs[i]);
-  //   serial_semipattern_search<gtl_p_map>(strings, "gtl", ofs, true_outputs[i]);
-  // }
-  // ofs.close();
+    serial_semipattern_search<ankerl_map>(strings, "ankerl", ofs, true_outputs[i]);
+    // serial_semipattern_search<std_map>(strings, "std", ofs, true_outputs[i]);
+    // serial_semipattern_search<gtl_p_map>(strings, "gtl", ofs, true_outputs[i]);
+  }
+  ofs.close();
 
   ////////////////////////
   // Parallel Map Tests //
