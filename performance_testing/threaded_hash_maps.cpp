@@ -60,13 +60,16 @@ int serial_semipattern_search(
 ) {
   MapType map;
   gtl_p_set_idxpair output;
+  gtl_p_set_str patterns;
   std::string N = std::to_string(input.size());
 
   measure_time(ofs, N + "," + map_name + ",insert", [&]() {
     for (size_t i = 0; i < input.size(); ++i) {
       const std::string& str = input[i];
-      for (const auto& pattern : semi2Patterns(str))
+      for (const auto& pattern : semi2Patterns(str)) {
+        patterns.insert(pattern);
         map[pattern].push_back(i);
+      }
     }
   });
 
