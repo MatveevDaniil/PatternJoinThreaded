@@ -168,6 +168,7 @@ int mapreduce_semipattern_search(
   std::string N = std::to_string(input.size());
   std::string P_str = std::to_string(P);
   std::vector<std::string> patterns_vector;
+  // tbb::concurrent_vector<std::string> patterns_vector;
   ints_vector_vector threads_idxs(P);
 
   measure_time(ofs, N + "," + map_name + ",insert," + P_str, [&]() {
@@ -176,7 +177,7 @@ int mapreduce_semipattern_search(
       int tid = omp_get_thread_num();
       auto& map = maps[tid];
       double wtime = omp_get_wtime();
-      #pragma omp for nowait
+      #pragma omp for
       for (size_t i = 0; i < input.size(); ++i) {
         const std::string& str = input[i];
         for (const auto& pattern : semi2Patterns(str))
