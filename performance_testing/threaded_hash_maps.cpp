@@ -300,7 +300,7 @@ int main() {
       //   strings, "gtl", ofs_p, P, true_outputs[i]);
     }
   }
-  ofs.close();
+  ofs_p.close();
 
   //////////////////////
   // Map Reduce Tests //
