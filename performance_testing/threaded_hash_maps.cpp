@@ -222,7 +222,7 @@ int mapreduce_semipattern_search(
       auto& thread_idxs = threads_idxs[tid];
       thread_idxs.reserve(patterns_vector.size() / P);
       double wtime = omp_get_wtime();
-      #pragma omp for schedule(dynamic, 1) nowait
+      #pragma omp for schedule(dynamic, 1)
       for (size_t i = 0; i < patterns_vector.size(); i++) {
         thread_idxs.push_back(std::vector<size_t>());
         auto& united_vector = thread_idxs.back();
@@ -236,6 +236,7 @@ int mapreduce_semipattern_search(
       }
       thread_idxs.shrink_to_fit();
       wtime = omp_get_wtime() - wtime;
+      std::cout << thread_idxs.size() << std::endl;
       printf("iterate 1: thread=%d: %f\n", tid, wtime);
     }
 
