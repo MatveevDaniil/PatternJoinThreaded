@@ -218,7 +218,7 @@ int mapreduce_semipattern_search(
         }
       }
       wtime = omp_get_wtime() - wtime;
-      printf("iterate: thread=%d: %f\n", tid, wtime);
+      printf("iterate 1: thread=%d: %f\n", tid, wtime);
     }
 
     // Now we parallely itearate over each collection_i
@@ -239,7 +239,7 @@ int mapreduce_semipattern_search(
               }
       }
       wtime = omp_get_wtime() - wtime;
-      printf("iterate: thread=%d: %f\n", tid, wtime);
+      printf("iterate 2: thread=%d: %f\n", tid, wtime);
     }
   });
   size_t output_size = output.size() + input.size();
@@ -279,7 +279,7 @@ int main() {
   // Serial Tests //
   //////////////////
   std::ofstream ofs("../test_results/serial_results_map.csv");
-  ofs << "N,set_impl,operation,time" << std::endl;
+  ofs << "N,map_impl,operation,time" << std::endl;
   std::cout << "serial test" << std::endl;
   std::cout << "N,set_impl,operation,time" << std::endl;
   for (size_t i = 0; i < TEST_FILES.size(); ++i) {
@@ -296,7 +296,7 @@ int main() {
   // Parallel Map Tests //
   ////////////////////////
   std::ofstream ofs_p("../test_results/parallel_results_map.csv");
-  ofs_p << "N,set_impl,operation,P,time" << std::endl;
+  ofs_p << "N,map_impl,operation,P,time" << std::endl;
   std::cout << "parallel test" << std::endl;
   std::cout << "N,set_impl,operation,P,time" << std::endl;
   for (size_t i = 0; i < TEST_FILES.size(); ++i) {
