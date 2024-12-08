@@ -202,16 +202,6 @@ int mapreduce_semipattern_search(
   std::cout << patterns_vector.size() << std::endl;
 
   measure_time(ofs, N + "," + map_name + ",iteration," + P_str, [&]() {
-    // This stage combines values (vectors) from local maps
-    // into a single `united_vector` for each pattern.
-    // To achieve a good parallelism we use a dynamic scheduling
-    // and we collect P collcections of `united_vector`s.
-    // In result we get a structure [collection_1, ..., collection_P]
-    // where collection_i is [united_vector_i_1, ..., united_vector_i_Ni]
-    // where united_vector_ij is a vector<size_t> corresponding to some pattern.
-    // Notice that Ni is different for each collection_i, 
-    // but since we are using dynamic scheduling,
-    // the sizes of each collection_i should be balances.
     united_vectors.reserve(patterns_vector.size());
     #pragma omp parallel num_threads(P) 
     {
@@ -229,6 +219,8 @@ int mapreduce_semipattern_search(
           united_vectors.push_back(&united_vector);
       }
     }
+
+    std::cout << united_vectors.size() << std::endl;
 
     // Now we parallely itearate over each collection_i
     #pragma omp parallel num_threads(P) 
@@ -250,7 +242,7 @@ int mapreduce_semipattern_search(
   });
   size_t output_size = output.size() + input.size();
   if (output_size != true_output_size) {
-    std::cout << output_size << std::endl;
+    std::cout << "the output size " << output_size << " is incorrect" << std::endl;
     std::ofstream ofs("check_output");
     for (const auto& [i, j] : output) {
       ofs << input[i] << " " << input[j] << std::endl;
