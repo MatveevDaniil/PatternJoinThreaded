@@ -168,8 +168,8 @@ int mapreduce_semipattern_search(
   std::string N = std::to_string(input.size());
   std::string P_str = std::to_string(P);
   // std::vector<std::string> patterns_vector;
-  gtl_p_set_str patterns_set;
   tbb::concurrent_vector<std::string> patterns_vector;
+  tbb::concurrent_vector<idx_vector*> united_vectors;
   ints_vector_vector threads_idxs(P);
 
   measure_time(ofs, N + "," + map_name + ",insert," + P_str, [&]() {
@@ -181,26 +181,22 @@ int mapreduce_semipattern_search(
       #pragma omp for
       for (size_t i = 0; i < input.size(); ++i) {
         const std::string& str = input[i];
-        for (const auto& pattern : semi2Patterns(str)) {
-          patterns_set.insert(pattern);
+        for (const auto& pattern : semi2Patterns(str))
           map[pattern].push_back(i);
-        }
       }
       wtime = omp_get_wtime() - wtime;
       printf("insert: thread=%d: %f\n", tid, wtime);
       
-      // for (auto& [pattern, _]: map) {
-      //   bool found = false;
-      //   for (int tid2 = 0; tid2 < tid; tid2++) {
-      //     auto& map2 = maps[tid2];
-      //     if (map2.find(pattern) != map2.end()) { found = true; break; }
-      //   }
-      //   if (!found)
-      //     patterns_vector.push_back(pattern);
-      // }
+      for (auto& [pattern, _]: map) {
+        bool found = false;
+        for (int tid2 = 0; tid2 < tid; tid2++) {
+          auto& map2 = maps[tid2];
+          if (map2.find(pattern) != map2.end()) { found = true; break; }
+        }
+        if (!found)
+          patterns_vector.push_back(pattern);
+      }
     }
-    for (auto& pattern: patterns_set)
-      patterns_vector.push_back(pattern);
   });
 
   std::cout << patterns_vector.size() << std::endl;
@@ -216,16 +212,12 @@ int mapreduce_semipattern_search(
     // Notice that Ni is different for each collection_i, 
     // but since we are using dynamic scheduling,
     // the sizes of each collection_i should be balances.
+    united_vectors.reserve(patterns_vector.size());
     #pragma omp parallel num_threads(P) 
     {
-      int tid = omp_get_thread_num();
-      auto& thread_idxs = threads_idxs[tid];
-      thread_idxs.reserve(patterns_vector.size() / P);
-      double wtime = omp_get_wtime();
       #pragma omp for schedule(dynamic, 10)
       for (size_t i = 0; i < patterns_vector.size(); i++) {
-        thread_idxs.push_back(std::vector<size_t>());
-        auto& united_vector = thread_idxs.back();
+        idx_vector united_vector;
         auto& pattern = patterns_vector[i];
         for (auto& map: maps) {
           if (map.find(pattern) == map.end()) 
@@ -233,28 +225,26 @@ int mapreduce_semipattern_search(
           auto& local_vector = map[pattern];
           united_vector.insert(united_vector.end(), local_vector.begin(), local_vector.end());
         }
+        if (united_vectors.size() > 1)
+          united_vectors.push_back(&united_vector);
       }
-      thread_idxs.shrink_to_fit();
-      wtime = omp_get_wtime() - wtime;
-      std::cout << thread_idxs.size() << std::endl;
-      printf("iterate 1: thread=%d: %f\n", tid, wtime);
     }
 
     // Now we parallely itearate over each collection_i
     #pragma omp parallel num_threads(P) 
     {
-      #pragma omp for schedule(dynamic, 10) collapse(2)
-      for (auto& thread_idxs: threads_idxs)
-        for (auto& idxs : thread_idxs) {
-          for (size_t i = 0; i < idxs.size(); ++i)
-            for (size_t j = i + 1; j < idxs.size(); ++j)
-              if (idxs[i] != idxs[j]) 
-                if (edit_distance_k(input[idxs[i]], input[idxs[j]], 2)) {
-                  if (idxs[i] < idxs[j])
-                    output.insert({idxs[i], idxs[j]});
-                  else
-                    output.insert({idxs[j], idxs[i]});
-                }
+      #pragma omp for schedule(dynamic, 10)
+      for (auto& idxs_ptr : united_vectors) {
+        auto& idxs = *idxs_ptr;
+        for (size_t i = 0; i < idxs.size(); ++i)
+          for (size_t j = i + 1; j < idxs.size(); ++j)
+            if (idxs[i] != idxs[j]) 
+              if (edit_distance_k(input[idxs[i]], input[idxs[j]], 2)) {
+                if (idxs[i] < idxs[j])
+                  output.insert({idxs[i], idxs[j]});
+                else
+                  output.insert({idxs[j], idxs[i]});
+              }
       }
     }
   });
