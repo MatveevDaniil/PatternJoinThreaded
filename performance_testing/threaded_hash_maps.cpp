@@ -186,16 +186,14 @@ int mapreduce_semipattern_search(
       wtime = omp_get_wtime() - wtime;
       printf("insert: thread=%d: %f\n", tid, wtime);
       
-      if (tid != 0) {
-        for (auto& [pattern, _]: map) {
-          bool found = false;
-          for (int tid2 = 0; tid2 < tid; tid2++) {
-            auto& map2 = maps[tid2];
-            if (map2.find(pattern) != map2.end()) { found = true; break; }
-          }
-          if (!found)
-            patterns_vector.push_back(pattern);
+      for (auto& [pattern, _]: map) {
+        bool found = false;
+        for (int tid2 = 0; tid2 < tid; tid2++) {
+          auto& map2 = maps[tid2];
+          if (map2.find(pattern) != map2.end()) { found = true; break; }
         }
+        if (!found)
+          patterns_vector.push_back(pattern);
       }
     }
   });
