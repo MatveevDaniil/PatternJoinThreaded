@@ -169,7 +169,7 @@ int mapreduce_semipattern_search(
   std::string P_str = std::to_string(P);
   // std::vector<std::string> patterns_vector;
   tbb::concurrent_vector<std::string> patterns_vector;
-  tbb::concurrent_vector<idx_vector*> united_vectors;
+  tbb::concurrent_vector<idx_vector> united_vectors;
   ints_vector_vector threads_idxs(P);
 
   measure_time(ofs, N + "," + map_name + ",insert," + P_str, [&]() {
