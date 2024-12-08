@@ -270,14 +270,14 @@ int main() {
   ofs << "N,map_impl,operation,time" << std::endl;
   std::cout << "serial test" << std::endl;
   std::cout << "N,map_impl,operation,time" << std::endl;
-  // for (size_t i = 0; i < TEST_FILES.size(); ++i) {
-  //   std::vector<std::string> strings;
-  //   readFile(TEST_FILES[i], strings);
+  for (size_t i = 0; i < TEST_FILES.size(); ++i) {
+    std::vector<std::string> strings;
+    readFile(TEST_FILES[i], strings);
 
-  //   serial_semipattern_search<ankerl_map>(strings, "ankerl", ofs, true_outputs[i]);
-  //   // serial_semipattern_search<std_map>(strings, "std", ofs, true_outputs[i]);
-  //   // serial_semipattern_search<gtl_p_map>(strings, "gtl", ofs, true_outputs[i]);
-  // }
+    serial_semipattern_search<ankerl_map>(strings, "ankerl", ofs, true_outputs[i]);
+    // serial_semipattern_search<std_map>(strings, "std", ofs, true_outputs[i]);
+    // serial_semipattern_search<gtl_p_map>(strings, "gtl", ofs, true_outputs[i]);
+  }
   ofs.close();
 
   ////////////////////////
