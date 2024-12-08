@@ -167,8 +167,8 @@ int mapreduce_semipattern_search(
   gtl_p_set_idxpair output;
   std::string N = std::to_string(input.size());
   std::string P_str = std::to_string(P);
-  std::vector<std::string> patterns_vector;
-  // tbb::concurrent_vector<std::string> patterns_vector;
+  // std::vector<std::string> patterns_vector;
+  tbb::concurrent_vector<std::string> patterns_vector;
   ints_vector_vector threads_idxs(P);
 
   measure_time(ofs, N + "," + map_name + ",insert," + P_str, [&]() {
@@ -187,7 +187,6 @@ int mapreduce_semipattern_search(
       printf("insert: thread=%d: %f\n", tid, wtime);
       
       if (tid != 0) {
-        auto& map0 = maps[0];
         for (auto& [pattern, _]: map) {
           bool found = false;
           for (int tid2 = 0; tid2 < tid; tid2++) {
@@ -195,13 +194,10 @@ int mapreduce_semipattern_search(
             if (map2.find(pattern) != map2.end()) { found = true; break; }
           }
           if (!found)
-            map0[pattern] = idx_vector();
+            patterns_vector.push_back(pattern);
         }
       }
     }
-    patterns_vector.reserve(maps[0].size());
-    for (auto& [pattern, idxs] : maps[0])
-      patterns_vector.push_back(pattern);
   });
 
   std::cout << patterns_vector.size() << std::endl;
