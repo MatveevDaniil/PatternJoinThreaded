@@ -215,7 +215,7 @@ int mapreduce_semipattern_search(
           auto& local_vector = map[pattern];
           united_vector.insert(united_vector.end(), local_vector.begin(), local_vector.end());
         }
-        if (united_vectors.size() > 1)
+        if (united_vector.size() > 1)
           united_vectors.push_back(&united_vector);
       }
     }
