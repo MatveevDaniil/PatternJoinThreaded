@@ -168,6 +168,7 @@ int mapreduce_semipattern_search(
   std::string N = std::to_string(input.size());
   std::string P_str = std::to_string(P);
   // std::vector<std::string> patterns_vector;
+  gtl_p_set_str patterns_set;
   tbb::concurrent_vector<std::string> patterns_vector;
   ints_vector_vector threads_idxs(P);
 
@@ -180,22 +181,26 @@ int mapreduce_semipattern_search(
       #pragma omp for
       for (size_t i = 0; i < input.size(); ++i) {
         const std::string& str = input[i];
-        for (const auto& pattern : semi2Patterns(str))
+        for (const auto& pattern : semi2Patterns(str)) {
+          patterns_set.insert(pattern);
           map[pattern].push_back(i);
+        }
       }
       wtime = omp_get_wtime() - wtime;
       printf("insert: thread=%d: %f\n", tid, wtime);
       
-      for (auto& [pattern, _]: map) {
-        bool found = false;
-        for (int tid2 = 0; tid2 < tid; tid2++) {
-          auto& map2 = maps[tid2];
-          if (map2.find(pattern) != map2.end()) { found = true; break; }
-        }
-        if (!found)
-          patterns_vector.push_back(pattern);
-      }
+      // for (auto& [pattern, _]: map) {
+      //   bool found = false;
+      //   for (int tid2 = 0; tid2 < tid; tid2++) {
+      //     auto& map2 = maps[tid2];
+      //     if (map2.find(pattern) != map2.end()) { found = true; break; }
+      //   }
+      //   if (!found)
+      //     patterns_vector.push_back(pattern);
+      // }
     }
+    for (auto& pattern: patterns_set)
+      patterns_vector.push_back(pattern);
   });
 
   std::cout << patterns_vector.size() << std::endl;
