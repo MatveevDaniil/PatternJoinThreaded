@@ -167,10 +167,7 @@ int mapreduce_semipattern_search(
   gtl_p_set_idxpair output;
   std::string N = std::to_string(input.size());
   std::string P_str = std::to_string(P);
-  // std::vector<std::string> patterns_vector;
   tbb::concurrent_vector<std::string> patterns_vector;
-  tbb::concurrent_vector<idx_vector> united_vectors;
-  ints_vector_vector threads_idxs(P);
 
   measure_time(ofs, N + "," + map_name + ",insert," + P_str, [&]() {
     #pragma omp parallel num_threads(P) 
@@ -199,43 +196,45 @@ int mapreduce_semipattern_search(
     }
   });
 
-  std::cout << patterns_vector.size() << std::endl;
 
   measure_time(ofs, N + "," + map_name + ",iteration," + P_str, [&]() {
-    united_vectors.reserve(patterns_vector.size());
     #pragma omp parallel num_threads(P) 
     {
       #pragma omp for schedule(dynamic, 10)
       for (size_t i = 0; i < patterns_vector.size(); i++) {
-        auto it = united_vectors.grow_by(1);
-        *it = idx_vector();
-        auto& united_vector = *it;
         auto& pattern = patterns_vector[i];
-        for (auto& map: maps) {
+        std::vector<idx_vector*> loc_idxs_vec;
+        loc_idxs_vec.reserve(P);
+        for (auto& map : maps) {
           if (map.find(pattern) == map.end()) 
             continue;
-          auto& local_vector = map[pattern];
-          united_vector.insert(united_vector.end(), local_vector.begin(), local_vector.end());
+          loc_idxs_vec.push_back(&map[pattern]);
+        }
+        for (size_t I = 0; I < loc_idxs_vec.size(); I++) {
+          auto& idxs = *loc_idxs_vec[I];
+          for (size_t i = 0; i < idxs.size(); ++i)
+            for (size_t j = i + 1; j < idxs.size(); ++j)
+              if (idxs[i] != idxs[j]) 
+                if (edit_distance_k(input[idxs[i]], input[idxs[j]], 2)) {
+                  if (idxs[i] < idxs[j])
+                    output.insert({idxs[i], idxs[j]});
+                  else
+                    output.insert({idxs[j], idxs[i]});
+                }
+          for (size_t J = I + 1; J < loc_idxs_vec.size(); J++) {
+            auto& idxs2 = *loc_idxs_vec[J];
+            for (size_t i = 0; i < idxs.size(); ++i)
+              for (size_t j = 0; j < idxs2.size(); ++j)
+                if (idxs[i] != idxs2[j]) 
+                  if (edit_distance_k(input[idxs[i]], input[idxs2[j]], 2)) {
+                    if (idxs[i] < idxs2[j])
+                      output.insert({idxs[i], idxs2[j]});
+                    else
+                      output.insert({idxs2[j], idxs[i]});
+                  }
+          }
         }
       }
-    }
-
-    std::cout << united_vectors.size() << std::endl;
-
-    // Now we parallely itearate over each collection_i
-    #pragma omp parallel num_threads(P) 
-    {
-      #pragma omp for schedule(dynamic, 10)
-      for (auto& idxs : united_vectors)
-        for (size_t i = 0; i < idxs.size(); ++i)
-          for (size_t j = i + 1; j < idxs.size(); ++j)
-            if (idxs[i] != idxs[j]) 
-              if (edit_distance_k(input[idxs[i]], input[idxs[j]], 2)) {
-                if (idxs[i] < idxs[j])
-                  output.insert({idxs[i], idxs[j]});
-                else
-                  output.insert({idxs[j], idxs[i]});
-              }
     }
   });
   size_t output_size = output.size() + input.size();
@@ -251,12 +250,9 @@ int mapreduce_semipattern_search(
   measure_time(ofs, N + "," + map_name + ",map_clear," + P_str, [&]() {
     #pragma omp parallel num_threads(P) 
     {
-      int tid = omp_get_thread_num();
-      maps[tid].clear();
-      threads_idxs[tid].clear();
+      maps[omp_get_thread_num()].clear();
     }
     maps.clear();
-    threads_idxs.clear();
     patterns_vector.clear();
   });
 
