@@ -222,7 +222,7 @@ int mapreduce_semipattern_search(
       auto& thread_idxs = threads_idxs[tid];
       thread_idxs.reserve(patterns_vector.size() / P);
       double wtime = omp_get_wtime();
-      #pragma omp for schedule(dynamic, 1)
+      #pragma omp for schedule(dynamic, 10)
       for (size_t i = 0; i < patterns_vector.size(); i++) {
         thread_idxs.push_back(std::vector<size_t>());
         auto& united_vector = thread_idxs.back();
@@ -243,23 +243,19 @@ int mapreduce_semipattern_search(
     // Now we parallely itearate over each collection_i
     #pragma omp parallel num_threads(P) 
     {
-      int tid = omp_get_thread_num();
-      auto& thread_idxs = threads_idxs[tid];
-      std::cout << thread_idxs.size() << std::endl;
-      double wtime = omp_get_wtime();
-      for (auto& idxs : thread_idxs) {
-        for (size_t i = 0; i < idxs.size(); ++i)
-          for (size_t j = i + 1; j < idxs.size(); ++j)
-            if (idxs[i] != idxs[j]) 
-              if (edit_distance_k(input[idxs[i]], input[idxs[j]], 2)) {
-                if (idxs[i] < idxs[j])
-                  output.insert({idxs[i], idxs[j]});
-                else
-                  output.insert({idxs[j], idxs[i]});
-              }
+      #pragma omp for schedule(dynamic, 10) collapse(2)
+      for (auto& thread_idxs: threads_idxs)
+        for (auto& idxs : thread_idxs) {
+          for (size_t i = 0; i < idxs.size(); ++i)
+            for (size_t j = i + 1; j < idxs.size(); ++j)
+              if (idxs[i] != idxs[j]) 
+                if (edit_distance_k(input[idxs[i]], input[idxs[j]], 2)) {
+                  if (idxs[i] < idxs[j])
+                    output.insert({idxs[i], idxs[j]});
+                  else
+                    output.insert({idxs[j], idxs[i]});
+                }
       }
-      wtime = omp_get_wtime() - wtime;
-      printf("iterate 2: thread=%d: %f\n", tid, wtime);
     }
   });
   size_t output_size = output.size() + input.size();
