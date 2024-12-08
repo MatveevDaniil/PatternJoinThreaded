@@ -207,7 +207,9 @@ int mapreduce_semipattern_search(
     {
       #pragma omp for schedule(dynamic, 10)
       for (size_t i = 0; i < patterns_vector.size(); i++) {
-        idx_vector united_vector;
+        auto it = united_vectors.grow_by(1);
+        *it = idx_vector();
+        auto& united_vector = *it;
         auto& pattern = patterns_vector[i];
         for (auto& map: maps) {
           if (map.find(pattern) == map.end()) 
@@ -215,8 +217,6 @@ int mapreduce_semipattern_search(
           auto& local_vector = map[pattern];
           united_vector.insert(united_vector.end(), local_vector.begin(), local_vector.end());
         }
-        if (united_vector.size() > 1)
-          united_vectors.push_back(&united_vector);
       }
     }
 
@@ -226,8 +226,7 @@ int mapreduce_semipattern_search(
     #pragma omp parallel num_threads(P) 
     {
       #pragma omp for schedule(dynamic, 10)
-      for (auto& idxs_ptr : united_vectors) {
-        auto& idxs = *idxs_ptr;
+      for (auto& idxs : united_vectors)
         for (size_t i = 0; i < idxs.size(); ++i)
           for (size_t j = i + 1; j < idxs.size(); ++j)
             if (idxs[i] != idxs[j]) 
@@ -237,7 +236,6 @@ int mapreduce_semipattern_search(
                 else
                   output.insert({idxs[j], idxs[i]});
               }
-      }
     }
   });
   size_t output_size = output.size() + input.size();
