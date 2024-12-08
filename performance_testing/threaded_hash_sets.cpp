@@ -2,6 +2,8 @@
 #include <unordered_set>
 #include "../thirdparty/unordered_dense.h"
 #include "../thirdparty/gtl/phmap.hpp"
+#define EMH_CACHE_LINE_SIZE 64
+#include "../thirdparty/hash_set8.hpp"
 #include "timing_impl.hpp"
 
 
@@ -9,6 +11,7 @@ using int_pair = std::pair<int, int>;
 using element_type = int;
 using std_vector = std::vector<element_type>;
 using std_set = std::unordered_set<element_type>;
+using emhash_set = emhash8::HashSet<element_type>;
 using ankerl_set = ankerl::unordered_dense::set<element_type>;
 using gtl_p_set = gtl::parallel_flat_hash_set_m<element_type>;
 
@@ -125,6 +128,7 @@ int main() {
     run_serial_test<std_vector>(input, "vector", ofs);
     run_serial_test<std_set>(input, "std", ofs);
     run_serial_test<ankerl_set>(input, "ankerl", ofs);
+    run_serial_test<emhash_set>(input, "emhash", ofs);
     run_serial_test<gtl_p_set>(input, "gtl", ofs);
   }
   ofs.close();
@@ -139,6 +143,7 @@ int main() {
     for (int P : threads) {
       run_parallel_test<std_vector>(input, "vector", P, ofs);
       run_parallel_test<std_set>(input, "std", P, ofs);
+      run_parallel_test<emhash_set>(input, "emhash", P, ofs);
       run_parallel_test<ankerl_set>(input, "ankerl", P, ofs);
       run_parallel_test<gtl_p_set>(input, "gtl", P, ofs);
     }

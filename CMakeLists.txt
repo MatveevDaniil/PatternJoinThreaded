@@ -14,7 +14,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif()
 
 find_package(OpenMP REQUIRED)
-
+find_package(TBB REQUIRED)
 
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(OBJ_DIR "${CMAKE_CURRENT_BINARY_DIR}/obj")
@@ -22,6 +22,6 @@ set(OBJ_DIR "${CMAKE_CURRENT_BINARY_DIR}/obj")
 file(GLOB SOURCES "${SRC_DIR}/*.cpp")
 add_executable(pattern_join ${SOURCES})
 
-target_link_libraries(pattern_join PUBLIC OpenMP::OpenMP_CXX)
+target_link_libraries(pattern_join PUBLIC OpenMP::OpenMP_CXX TBB::tbb)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")

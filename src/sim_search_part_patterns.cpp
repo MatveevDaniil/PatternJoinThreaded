@@ -40,7 +40,10 @@ void sim_search_2parts(
     }
   
   check_part<TrimDirection::Start>(strings, cutoff, metric, str2idx, start2idxs, out);
-  check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
+  if (metric == 'L')
+    check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
+  else
+    check_part<TrimDirection::No>(strings, cutoff, metric, str2idx, end2idxs, out);
   
   if (include_eye)
     for (size_t i = 0; i < strings.size(); i++)
@@ -117,8 +120,11 @@ void sim_search_3parts(
 
   start = std::chrono::high_resolution_clock::now();
   check_part<TrimDirection::Start>(strings, cutoff, metric, str2idx, start2idxs, out);
-  check_part<TrimDirection::Mid>(strings, cutoff, metric, str2idx, mid2idxs, out);
-  check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
+  check_part<TrimDirection::No>(strings, cutoff, metric, str2idx, mid2idxs, out);
+  if (metric == 'L')
+    check_part<TrimDirection::End>(strings, cutoff, metric, str2idx, end2idxs, out);
+  else
+    check_part<TrimDirection::No>(strings, cutoff, metric, str2idx, end2idxs, out);
   if (include_eye)
     #pragma omp parallel for
     for (size_t i = 0; i < strings.size(); i++)

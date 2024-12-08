@@ -7,6 +7,7 @@
 #include "../thirdparty/concurrentqueue.h"
 #include "../src/bounded_edit_distance.hpp"
 #include "../thirdparty/small_vector.hpp"
+#include "../thirdparty/hash_table8.hpp"
 #include "timing_impl.hpp"
 #include <tbb/concurrent_vector.h>
 
@@ -14,6 +15,7 @@ using idx_vector = gch::small_vector<size_t>;
 using std_map = std::unordered_map<std::string, idx_vector>;
 using ankerl_map = ankerl::unordered_dense::map<std::string, idx_vector>;
 using tbb_vector = tbb::concurrent_vector<size_t>;
+using emhash_map = emhash8::HashMap<std::string, idx_vector>;
 using ints_vector_vector = std::vector<std::vector<std::vector<size_t>>>;
 using gtl_p_map = gtl::parallel_flat_hash_map_m<std::string, tbb_vector>;
 using gtl_p_set_idxpair = gtl::parallel_flat_hash_set_m<std::pair<size_t, size_t>>;
@@ -390,8 +392,9 @@ int main() {
     readFile(TEST_FILES[i], strings);
 
     serial_semipattern_search<ankerl_map>(strings, "ankerl", ofs, true_outputs[i]);
-    // serial_semipattern_search<std_map>(strings, "std", ofs, true_outputs[i]);
-    // serial_semipattern_search<gtl_p_map>(strings, "gtl", ofs, true_outputs[i]);
+    serial_semipattern_search<emhash_map>(strings, "emhash", ofs, true_outputs[i]);
+    serial_semipattern_search<std_map>(strings, "std", ofs, true_outputs[i]);
+    serial_semipattern_search<gtl_p_map>(strings, "gtl", ofs, true_outputs[i]);
   }
   ofs.close();
 
@@ -411,8 +414,8 @@ int main() {
         strings, "gtl_mapreduce2", ofs_p, P, true_outputs[i]);
       mapreduce_semipattern_search<ankerl_map>(
         strings, "ankerl_mapreduce", ofs_p, P, true_outputs[i]);
-      // phmap_semipattern_search<gtl_p_map>(
-      //   strings, "gtl", ofs_p, P, true_outputs[i]);
+      phmap_semipattern_search<gtl_p_map>(
+        strings, "gtl", ofs_p, P, true_outputs[i]);
     }
   }
   ofs_p.close();

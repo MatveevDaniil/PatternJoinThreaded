@@ -29,9 +29,8 @@ inline std::string trimString<TrimDirection::End>(
 
 template <>
 inline std::string trimString<TrimDirection::No>(
-  const std::string& str, int trim_size
+  const std::string& str, int trim_size [[maybe_unused]]
 ) {
-  (void)trim_size;
   return str;
 }
 
