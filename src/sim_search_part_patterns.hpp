@@ -114,8 +114,10 @@ inline void check_part(
   for (size_t i = 0; i < entries_large.size(); i++) {
     const auto* entry = entries_large[i];
           auto start = std::chrono::high_resolution_clock::now();
+    std::cout << "out size " << out.size() << std::endl;
     sim_search_semi_patterns_omp_impl<trim_direction>(
       strings, cutoff, metric, str2idx, out, &entry->second, false, entry->first);
+    std::cout << "out size " << out.size() << std::endl;
           auto end = std::chrono::high_resolution_clock::now();
           std::chrono::duration<double> elapsed_seconds = end - start;
           printf("large entry size=%ld: %f\n", entry->second.size(), elapsed_seconds.count());
