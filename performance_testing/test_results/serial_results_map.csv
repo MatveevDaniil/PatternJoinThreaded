@@ -1,1 +1,13 @@
-N,set_impl,operation,time
+N,map_impl,operation,time
+392574,ankerl,insert,9.84197
+392574,ankerl,iteration,15.7119
+392574,ankerl,map_clear,0.271637
+392574,emhash,insert,15.9122
+392574,emhash,iteration,16.0137
+392574,emhash,map_clear,0.29638
+392574,std,insert,19.0276
+392574,std,iteration,21.6215
+392574,std,map_clear,3.3363
+392574,gtl,insert,18.3057
+392574,gtl,iteration,20.9088
+392574,gtl,map_clear,6.70366
