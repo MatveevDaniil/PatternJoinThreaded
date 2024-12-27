@@ -35,10 +35,10 @@ def plot_hash_set_serial():
   ###################
   df = df[df['operation'] == 'insert']
   df['performance'] =  df['N'] / df['time'] / 1_000_000
-
+  df['N'] = df['N'] / 1_000
   sns.lineplot(data=df, x='N', y='performance', marker='o', hue='set_impl')
   plt.legend(title='Set Implementation')
-  # plt.title('Hash Set test: Inserting Integers 1...N')
+  plt.title('Hash Set test: Inserting Integers 1...N')
   plt.xlabel('N (thousands)')
   plt.ylabel('Performance (insertions/ns)')
   plt.savefig(f'{test_dir_path}/set_serial_insert_perf.png', dpi=300)
@@ -61,10 +61,10 @@ def plot_hash_set_speedup():
   df_speedup = df_merged.drop(columns=['time_p1'])
 
   sns.barplot(data=df_speedup, x='set_impl', y='normalized_time', hue='P')
-  # plt.title('Hash Set test: Slow down on 200K insertions')
+  plt.title('Hash Set test: Slow down on 200K insertions')
   plt.xlabel('Set Implementation')
   plt.ylabel('P threads runtime / 1 thread runtime')
-  plt.legend(title='Number of threads', bbox_to_anchor=(1.05, 10), loc='upper left')
+  plt.legend(title='Number of threads')
   plt.savefig(f'{test_dir_path}/set_parallel_insert_speedup.png', dpi=300)
   plt.close()
 
@@ -78,7 +78,7 @@ def plot_hash_set_speedup():
 
   sns.lineplot(data=df, x='N', y='performance', marker='o', hue='set_impl')
   plt.legend(title='Set Implementation')
-  # plt.title('Hash Set test: Inserting Integers 1...N with 16 threads')
+  plt.title('Hash Set test: Inserting Integers 1...N with 16 threads')
   plt.xlabel('N (thousands)')
   plt.ylabel('Performance (insertions/μs)')
   plt.savefig(f'{test_dir_path}/set_parallel16_insert_perf.png', dpi=300)
@@ -100,7 +100,7 @@ def plot_hash_map_serial():
 
   sns.barplot(data=df, x='map_impl', y='time', hue='operation')
   plt.legend(title='Algorithm Stage')
-  # plt.title('Serial SimSearch Test: Joining 400K strings')
+  plt.title('Semi-Pattern Join of 400K strings with 1 thread')
   plt.xlabel('Map Implementation')
   plt.ylabel('Time (s)')
   plt.savefig(f'{test_dir_path}/map_serial_simsearch_time.png', dpi=300)
@@ -127,7 +127,7 @@ def plot_hash_map_speedup():
   df_merged['normalized_time'] = df_merged['time_p1'] / df_merged['time']
   df_speedup = df_merged.drop(columns=['time_p1'])
   sns.lineplot(data=df_speedup, x='P', y='normalized_time', marker='o', hue='map_impl')
-  # plt.title('Hash Map test: Slow down on 200K insertions')
+  plt.title('Speedup of Semi-Pattern Join')
   plt.legend(title='Parallelization Strategy')
   plt.xlabel('Number of threads')
   plt.ylabel('1 thread runtime / P threads runtime')
@@ -137,9 +137,9 @@ def plot_hash_map_speedup():
   ################### 
   ## runtime on 16 threads
   ###################
-  sns.barplot(data=df, x='P', y='time', hue='map_impl')
+  sns.barplot(data=df, x='P', y='time', hue='map_impl', errorbar=None)
   plt.legend(title='Parallelization Strategy')
-  # plt.title('Hash Set test: Inserting Integers 1...N with 16 threads')
+  plt.title('Semi-Pattern Join Runtime with different number of threads')
   plt.xlabel('Number of threads')
   plt.ylabel('Runtime (s)')
   plt.savefig(f'{test_dir_path}/map_parallel_runtime.png', dpi=300)
@@ -153,6 +153,7 @@ def plot_hash_map_speedup():
   df_clear['clear_part'] = df_clear['time_x'] / df_clear['time_y'] * 100
   df_clear = df_clear[['map_impl', 'P', 'clear_part']]
   sns.barplot(data=df_clear, x='P', y='clear_part', hue='map_impl')
+  plt.title('Part taken by clearing the map in Semi-Pattern Join')
   plt.legend(title='Parallelization Strategy')
   plt.xlabel('Clear part of the algorithm (%)')
   plt.ylabel('Runtime (s)')
@@ -161,17 +162,26 @@ def plot_hash_map_speedup():
 
 def final_algo_speedup():
   thread_num = [1, 2, 4, 8, 16]
-  runtime = [23.19, 16.20, 11.10, 8.13, 9.15]
-  speedup = [runtime[0] / r for r in runtime]
-  sns.lineplot(x=thread_num, y=speedup, marker='o')
+  runtime_withz = [43.53, 29.71, 19.71, 14.18, 15.39]
+  runtime_noz = [43.00, 27.05, 20.33, 17.21, 18.35]
+  speedup_withz = [runtime_withz[0] / r for r in runtime_withz]
+  speedup_noz = [runtime_noz[0] / r for r in runtime_noz]
+  data = {
+    'Number of threads': thread_num * 2,
+    'Speedup': speedup_withz + speedup_noz,
+    'Imbalance parameter': ['20K'] * len(thread_num) + ['∞'] * len(thread_num)
+  }
+  df = pd.DataFrame(data)
+  sns.lineplot(data=df, x='Number of threads', y='Speedup', marker='o', hue='Imbalance parameter')
+  plt.title('Speedup of Partition-Pattern Join algorithm')
   plt.xlabel('Number of threads')
   plt.ylabel('Speedup')
   plt.savefig(f'{test_dir_path}/final_algo_speedup.png', dpi=300)
   plt.close()
 
 if __name__ == "__main__":
-  # plot_hash_set_serial()
-  # plot_hash_set_speedup()
-  # plot_hash_map_serial()
-  # plot_hash_map_speedup()
+  plot_hash_set_serial()
+  plot_hash_set_speedup()
+  plot_hash_map_serial()
+  plot_hash_map_speedup()
   final_algo_speedup()
