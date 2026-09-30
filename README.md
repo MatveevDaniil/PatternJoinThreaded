@@ -58,7 +58,7 @@ Below we give an example of algorithm launch:
 - `--file_names <file_a> <file_b>`: Join two files instead of `--file_name`. Results use original A/B indices (`include_duplicates=true`) or unique string pairs (`false`), written to `<file_a>_cross_sp_<cutoff>_<metric>`. Cutoff 0 writes exact-match index pairs to `<file_a>_cross_dupl`. Nonzero cutoffs currently support only `semi_pattern`; use `OMP_NUM_THREADS` to control threads.
 - `<cutoff>`: The edit distance cutoff (`0`, `1` or `2`). If `cutoff` = 0, then the value of `metric_type`, `method`, and `include_duplicates` does not matter.
 - `<metric_type>`: The edit distance metric (`L` for Levenshtein, `H` for Hamming).
-- `<method>`: For threaded implementation we currently tested only `partition_pattern`. 
+- `<method>`: Two-file joins support `semi_pattern`; single-file joins also support `pattern` and `partition_pattern`.
 - `<include_duplicates>`: Consider duplicates in input (`true` or `false`). If `false` the program will ignore duplicate strings in the input and output unique pairs of strings. If `true`, the program will treat duplicate strings in the input as a pair (index, string) and output pairs of indices. 
 
 ### Input file format
