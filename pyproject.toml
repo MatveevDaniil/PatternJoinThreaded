@@ -1,0 +1,21 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11>=2.13"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "patternjoin"
+version = "0.1.0"
+description = "String similarity joins using C++ and OpenMP"
+readme = "python/README.md"
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+authors = [{name = "Daniil Matveev"}]
+
+[project.urls]
+Repository = "https://github.com/MatveevDaniil/PatternJoinThreaded"
+
+[tool.scikit-build]
+cmake.source-dir = "python"
+wheel.packages = ["python/patternjoin"]
+sdist.exclude = ["build/**", "dist/**", ".venv/**",
+  "**/__pycache__/**", "**/.pytest_cache/**"]

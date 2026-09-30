@@ -1,6 +1,8 @@
 # PatternJoinThreaded
 This project is an experimental version of PatternJoin project, and is designed to test parallelization capabilities of our algorithms. In order to read more about the main algorithms please visit our [C++](https://github.com/MatveevDaniil/PatternJoin) or [R](https://matveevdaniil.r-universe.dev/RPatternJoin) packages.
 
+Python installation and API: [python/README.md](python/README.md).
+
 ## What is Edit Similarity Join?
 [_Edit distance_](https://en.wikipedia.org/w/index.php?search=Edit+distance&title=Special:Search&ns0=1) between two words is the minimal number of _elementary operations_ needed to transform one word to another. In this project, we consider [_Levenshtein distance_](https://en.wikipedia.org/wiki/Levenshtein_distance) (allows _substitutions_ and _insertions_/_deletions_ of single letters) and [_Hamming distance_](https://en.wikipedia.org/wiki/Hamming_distance) (allows _substitutions_ of any letters and _insertions_/_deletions_ of letters in the end). 
 
