@@ -46,3 +46,21 @@ macOS wheel, run `delocate-wheel -w wheelhouse dist/*.whl` and test
 the repaired wheel in a fresh environment. Linux wheels need the
 corresponding `auditwheel repair` workflow. Nothing is published
 to PyPI by these commands.
+
+## Releases
+
+`.github/workflows/publish.yml` builds and tests CPython 3.9–3.14
+wheels for Linux x86-64 and macOS 15+ (Intel and Apple Silicon),
+bundling the native runtime libraries. Pull requests only build/test.
+
+Configure a PyPI Trusted Publisher for project `patternjoin`, owner
+`MatveevDaniil`, repository `PatternJoinThreaded`, workflow
+`publish.yml`, environment `pypi`. No API token is needed.
+For a trial upload, configure the same publisher on TestPyPI with
+environment `testpypi`, then manually run the workflow on `main`
+with `testpypi` enabled.
+
+To publish, update the version in `pyproject.toml`, merge the change,
+and publish a GitHub release with the matching tag (e.g. `v0.1.0`).
+After all wheel tests pass, the workflow uploads wheels and the
+source archive to PyPI. Each release needs a new version.

@@ -19,3 +19,19 @@ cmake.source-dir = "python"
 wheel.packages = ["python/patternjoin"]
 sdist.exclude = ["build/**", "dist/**", ".venv/**",
   "**/__pycache__/**", "**/.pytest_cache/**"]
+
+[tool.cibuildwheel]
+build = "cp3{9,10,11,12,13,14}-*"
+skip = "*-musllinux_*"
+archs = ["native"]
+test-requires = ["pytest"]
+test-command = "python -m pytest {project}/python/tests -q"
+environment = {OMP_NUM_THREADS = "2"}
+
+[tool.cibuildwheel.linux]
+manylinux-x86_64-image = "manylinux_2_28"
+before-all = "dnf install -y tbb-devel"
+
+[tool.cibuildwheel.macos]
+before-all = "brew install libomp tbb"
+environment = {OMP_NUM_THREADS = "2", MACOSX_DEPLOYMENT_TARGET = "15.0"}
